@@ -1,0 +1,7 @@
+AbstractBean
+NormalBean
+StandaloneCollectionBean
+StandaloneListBean
+StandaloneSetBean
+StandaloneMapBean
+ExternalBundleBean
