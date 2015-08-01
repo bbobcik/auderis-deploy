@@ -39,7 +39,7 @@ public class ExternalBundleBean extends AbstractBean {
 		return sourceMode;
 	}
 
-	@XmlAttribute(name = "combine")
+	@XmlAttribute(name = "useResource")
 	protected final String getSourceModeCode() {
 		return sourceMode.getCanonicalName();
 	}

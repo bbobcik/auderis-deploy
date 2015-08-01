@@ -7,8 +7,11 @@ import cz.auderis.deploy.descriptor.bean.NormalBean;
 import cz.auderis.deploy.descriptor.bean.StandaloneListBean;
 import cz.auderis.deploy.descriptor.bean.StandaloneMapBean;
 import cz.auderis.deploy.descriptor.bean.StandaloneSetBean;
+import cz.auderis.test.category.SanityTest;
+import cz.auderis.test.category.UnitTest;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Unmarshaller;
@@ -33,6 +36,7 @@ public class BasicBeanParsingTest {
 	}
 
 	@Test
+	@Category({ UnitTest.class, SanityTest.class })
 	public void shouldParseEmptyNormalBean() throws Exception {
 		// Given
 		final Reader xml = xml("<bean name=\"xyz\" class=\"java.lang.Object\" ></bean>");
@@ -47,6 +51,7 @@ public class BasicBeanParsingTest {
 	}
 
 	@Test
+	@Category({ UnitTest.class, SanityTest.class })
 	public void shouldParseEmptyListBean() throws Exception {
 		// Given
 		final Reader xml = xml("<list name=\"list123\"></list>");
@@ -62,6 +67,7 @@ public class BasicBeanParsingTest {
 	}
 
 	@Test
+	@Category({ UnitTest.class, SanityTest.class })
 	public void shouldParseEmptySetBean() throws Exception {
 		// Given
 		final Reader xml = xml("<set name=\"setABC\"></set>");
@@ -77,6 +83,7 @@ public class BasicBeanParsingTest {
 	}
 
 	@Test
+	@Category({ UnitTest.class, SanityTest.class })
 	public void shouldParseEmptyMapBean() throws Exception {
 		// Given
 		final Reader xml = xml("<map name=\"aMap\"></map>");
@@ -93,6 +100,7 @@ public class BasicBeanParsingTest {
 	}
 
 	@Test
+	@Category({ UnitTest.class, SanityTest.class })
 	public void shouldParseEmptyBundleBean() throws Exception {
 		// Given
 		final Reader xml = xml("<propertyBundle name=\"bundle\"></propertyBundle>");
@@ -107,60 +115,6 @@ public class BasicBeanParsingTest {
 	}
 
 
-	@Test
-	public void shouldParseBeanInstantiationModeInStrictMode() throws Exception {
-		System.setProperty("auderis.deploy.lenient", Boolean.FALSE.toString());
-		for (BeanInstantiationMode mode : BeanInstantiationMode.values()) {
-			// Given
-			final Reader xml = xml("<bean name=\"x\" mode=\"" + mode.getCanonicalName() + "\" />");
-			// When
-			final Object parsedObj = xmlParser.unmarshal(xml);
-			// Then
-			assertThat(parsedObj, instanceOf(NormalBean.class));
-			final NormalBean bean = (NormalBean) parsedObj;
-			final BeanInstantiationMode parsedMode = bean.getInstantiationMode();
-			assertThat(parsedMode, is(mode));
-		}
-	}
-
-	@Test
-	public void shouldNotParseBeanInstantiationModeAliasesInStrictMode() throws Exception {
-		System.setProperty("auderis.deploy.lenient", Boolean.FALSE.toString());
-		for (BeanInstantiationMode mode : BeanInstantiationMode.values()) {
-			for (final String name : mode.getRecognizedNames()) {
-				// Given
-				if (name.equals(mode.getCanonicalName())) {
-					continue;
-				}
-				final Reader xml = xml("<bean name=\"x\" mode=\"" + name + "\" />");
-				// When
-				final Object parsedObj;
-				try {
-					parsedObj = xmlParser.unmarshal(xml);
-					fail("Parsed despite invalid name " + name + " for mode " + mode);
-				} catch (DescriptorParsingException e) {
-					// ok
-				}
-			}
-		}
-	}
-
-	@Test
-	public void shouldParseBeanInstantiationModeAliasesInLenientMode() throws Exception {
-		System.setProperty("auderis.deploy.lenient", Boolean.TRUE.toString());
-		for (BeanInstantiationMode mode : BeanInstantiationMode.values()) {
-			for (final String name : mode.getRecognizedNames()) {
-				// Given
-				final Reader xml = xml("<bean name=\"x\" mode=\"" + name + "\" />");
-				// When
-				final Object parsedObj = xmlParser.unmarshal(xml);
-				assertThat(parsedObj, instanceOf(NormalBean.class));
-				final NormalBean bean = (NormalBean) parsedObj;
-				final BeanInstantiationMode parsedMode = bean.getInstantiationMode();
-				assertThat("Parsing name " + name, parsedMode, is(mode));
-			}
-		}
-	}
 
 
 }
