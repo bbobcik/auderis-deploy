@@ -36,7 +36,7 @@
 		<property name="refProp"> <inject-property bean="simpleBean1" property="textProp" /> </property>
 	</bean>
 
-	<bean name="simpleBean5" class="cz.auderis.deploy.test.TestBean" >
+	<bean name="complexBean1" class="cz.auderis.deploy.test.TestBean" >
 		<constructor>
 			<argument property="numProp" />
 		</constructor>
@@ -45,7 +45,7 @@
 		<property name="refProp"> <inject-property bean="simpleBean1" property="textProp" /> </property>
 	</bean>
 
-	<bean name="simpleBean6" class="cz.auderis.deploy.test.TestBean" >
+	<bean name="complexBean2" class="cz.auderis.deploy.test.TestBean" >
 		<constructor>
 			<argument property="numProp" />
 			<argument property="beanProp" />
@@ -69,14 +69,8 @@
 	</set>
 
 	<map name="simpleMap">
-		<entry>
-			<key>one</key>
-			<value>1</value>
-		</entry>
-		<entry>
-			<key>two</key>
-			<value>2</value>
-		</entry>
+		<entry><key>one</key><value>1</value></entry>
+		<entry><key>two</key><value>2</value></entry>
 	</map>
 
 </deployment>

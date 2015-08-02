@@ -21,7 +21,7 @@ import cz.auderis.deploy.descriptor.visitor.DeploymentStructureVisitor;
 import cz.auderis.deploy.descriptor.visitor.VisitableStructuralNode;
 import cz.auderis.deploy.descriptor.visitor.VisitorContext;
 
-import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlElementRef;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 import java.io.Serializable;
@@ -31,10 +31,10 @@ import java.io.Serializable;
 public class MapEntryElement implements VisitableStructuralNode, Serializable {
 	private static final long serialVersionUID = 20150728L;
 
-	@XmlElement(name = "key", required = true)
+	@XmlElementRef(required = true)
 	protected MapKeyElement key;
 
-	@XmlElement(name = "value", required = true)
+	@XmlElementRef(required = true)
 	protected MapValueElement value;
 
 	public MapKeyElement getKeyElement() {
@@ -49,7 +49,15 @@ public class MapEntryElement implements VisitableStructuralNode, Serializable {
 	public void accept(DeploymentStructureVisitor visitor, VisitorContext context) {
 		context.pushContextPart(this);
 		try {
-			visitor.visitMapEntry(this);
+			final boolean parentFirst = (VisitorContext.VisitOrder.PARENT_FIRST == context.getVisitOrder());
+			if (parentFirst) {
+				visitor.visitMapEntry(this);
+			}
+			key.accept(visitor, context);
+			value.accept(visitor, context);
+			if (!parentFirst) {
+				visitor.visitMapEntry(this);
+			}
 		} finally {
 			context.popContextPart();
 		}

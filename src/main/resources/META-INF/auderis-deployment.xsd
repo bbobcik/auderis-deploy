@@ -217,14 +217,7 @@
 		<xs:complexContent>
 			<xs:extension base="beanType">
 				<xs:sequence minOccurs="0" maxOccurs="unbounded">
-					<xs:element name="entry">
-						<xs:complexType>
-							<xs:sequence>
-								<xs:element name="key" type="injectableContentType" />
-								<xs:element name="value" type="injectableContentType" />
-							</xs:sequence>
-						</xs:complexType>
-					</xs:element>
+					<xs:element ref="entry" />
 				</xs:sequence>
 				<xs:attribute name="keyClass" type="javaQualifiedClassName" use="optional" />
 				<xs:attribute name="valueClass" type="javaQualifiedClassName" use="optional" />
@@ -266,6 +259,13 @@
 		</xs:complexContent>
 	</xs:complexType>
 
+	<xs:complexType name="mapEntryType">
+		<xs:sequence>
+			<xs:element ref="key" />
+			<xs:element ref="value" />
+		</xs:sequence>
+	</xs:complexType>
+
 	<xs:complexType name="beanInjectionType">
 		<xs:attribute name="bean" type="beanName" use="optional" />
 		<xs:attribute name="materialize" type="materializationMode" use="optional" default="Early" />
@@ -290,6 +290,9 @@
 	<xs:element name="constructor" type="constructorType" />
 	<xs:element name="argument" type="constructorArgumentType" />
 	<xs:element name="item" type="injectableContentType" />
+	<xs:element name="entry" type="mapEntryType" />
+	<xs:element name="key" type="injectableContentType" />
+	<xs:element name="value" type="injectableContentType" />
 
 	<xs:element name="inject" type="beanInjectionType" />
 	<xs:element name="inject-property" type="propertyInjectionType" />

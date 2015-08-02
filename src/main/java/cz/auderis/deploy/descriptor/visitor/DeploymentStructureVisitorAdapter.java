@@ -23,6 +23,8 @@ import cz.auderis.deploy.descriptor.initializer.CollectionItemElement;
 import cz.auderis.deploy.descriptor.initializer.ConstructorArgumentElement;
 import cz.auderis.deploy.descriptor.initializer.ConstructorElement;
 import cz.auderis.deploy.descriptor.initializer.MapEntryElement;
+import cz.auderis.deploy.descriptor.initializer.MapKeyElement;
+import cz.auderis.deploy.descriptor.initializer.MapValueElement;
 import cz.auderis.deploy.descriptor.initializer.PropertyElement;
 
 public class DeploymentStructureVisitorAdapter extends DeploymentVisitorAdapter implements DeploymentStructureVisitor {
@@ -49,6 +51,16 @@ public class DeploymentStructureVisitorAdapter extends DeploymentVisitorAdapter 
 
 	@Override
 	public void visitMapEntry(MapEntryElement mapEntry) {
+		// No operation
+	}
+
+	@Override
+	public void visitMapKey(MapKeyElement mapKey) {
+		// No operation
+	}
+
+	@Override
+	public void visitMapValue(MapValueElement mapValue) {
 		// No operation
 	}
 

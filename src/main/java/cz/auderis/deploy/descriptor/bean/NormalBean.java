@@ -24,7 +24,6 @@ import cz.auderis.deploy.descriptor.visitor.DeploymentVisitor;
 import cz.auderis.deploy.descriptor.visitor.VisitorContext;
 
 import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementRef;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
@@ -39,7 +38,7 @@ public class NormalBean extends AbstractBean {
 	@XmlAttribute(name = "class", required = true)
 	protected String beanClass;
 
-	@XmlElement(required = false)
+	@XmlElementRef(required = false)
 	protected ConstructorElement constructor;
 
 	@XmlElementRef(type = PropertyElement.class, required = false)

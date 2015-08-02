@@ -26,6 +26,7 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.transform.Source;
 import javax.xml.validation.Schema;
+import java.io.InputStream;
 import java.io.StringReader;
 
 public final class XmlSupport {
@@ -35,6 +36,13 @@ public final class XmlSupport {
 		final StringReader inReader = new StringReader(xmlText);
 		final InputSource baseSource = new InputSource(inReader);
 		// Create filtered SAX source
+		final Source filteredSource = DescriptorParserSupport.filterSourceNamespace(baseSource);
+		return filteredSource;
+	}
+
+	public static Source xml(Class<?> baseClass, String resourceName) throws SAXException {
+		final InputStream resourceStream = baseClass.getResourceAsStream(resourceName);
+		final InputSource baseSource = new InputSource(resourceStream);
 		final Source filteredSource = DescriptorParserSupport.filterSourceNamespace(baseSource);
 		return filteredSource;
 	}

@@ -17,6 +17,7 @@
 
 package cz.auderis.deploy.descriptor.initializer;
 
+import cz.auderis.deploy.descriptor.dependency.AbstractInjectionElement;
 import cz.auderis.deploy.descriptor.dependency.BeanInjectionElement;
 import cz.auderis.deploy.descriptor.dependency.PropertyInjectionElement;
 import cz.auderis.deploy.descriptor.visitor.DeploymentStructureVisitor;
@@ -27,6 +28,7 @@ import javax.xml.bind.annotation.XmlElementRef;
 import javax.xml.bind.annotation.XmlElementRefs;
 import javax.xml.bind.annotation.XmlMixed;
 import java.io.Serializable;
+import java.util.Collections;
 import java.util.List;
 
 public abstract class AbstractInitializerContentHolder implements Serializable {
@@ -40,14 +42,37 @@ public abstract class AbstractInitializerContentHolder implements Serializable {
 	protected List<Object> contents;
 
 	public List<Object> getContents() {
+		normalizeContents();
 		return contents;
 	}
 
 
-	protected void acceptVisitorForContents(DeploymentStructureVisitor visitor, VisitorContext context) {
-		if (null == context) {
+	protected void normalizeContents() {
+		if (null == contents) {
+			contents = Collections.emptyList();
+			return;
+		} else if (contents.size() <= 1) {
 			return;
 		}
+		int textSize = 0;
+		for (final Object item : contents) {
+			if (item instanceof AbstractInjectionElement) {
+				contents = Collections.singletonList(item);
+				return;
+			}
+			assert item instanceof String;
+			textSize += ((String) item).length();
+		}
+		final StringBuilder str = new StringBuilder(textSize);
+		for (final Object item : contents) {
+			str.append(item);
+		}
+		final String joinedText = str.toString();
+		contents = Collections.singletonList((Object) joinedText);
+	}
+
+	protected void acceptVisitorForContents(DeploymentStructureVisitor visitor, VisitorContext context) {
+		normalizeContents();
 		for (final Object item : contents) {
 			if (item instanceof String) {
 				visitor.visitStringValue((String) item);

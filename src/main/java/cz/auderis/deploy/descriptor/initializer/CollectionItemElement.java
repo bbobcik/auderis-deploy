@@ -33,7 +33,14 @@ public class CollectionItemElement extends AbstractInitializerContentHolder impl
 	public void accept(DeploymentStructureVisitor visitor, VisitorContext context) {
 		context.pushContextPart(this);
 		try {
-			visitor.visitCollectionItem(this);
+			final boolean parentFirst = (VisitorContext.VisitOrder.PARENT_FIRST == context.getVisitOrder());
+			if (parentFirst) {
+				visitor.visitCollectionItem(this);
+			}
+			acceptVisitorForContents(visitor, context);
+			if (!parentFirst) {
+				visitor.visitCollectionItem(this);
+			}
 		} finally {
 			context.popContextPart();
 		}

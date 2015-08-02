@@ -17,6 +17,7 @@
 
 package cz.auderis.deploy.descriptor.bean;
 
+import cz.auderis.deploy.descriptor.initializer.ConstructorElement;
 import cz.auderis.deploy.descriptor.initializer.PropertyElement;
 import cz.auderis.test.category.UnitTest;
 import org.junit.Before;
@@ -31,8 +32,10 @@ import java.util.List;
 
 import static cz.auderis.deploy.XmlSupport.createValidatingParser;
 import static cz.auderis.deploy.XmlSupport.xml;
+import static org.hamcrest.Matchers.hasProperty;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 
@@ -122,6 +125,20 @@ public class NormalBeanParsingTest {
 		assertThat(properties, hasSize(1));
 		final PropertyElement property = properties.get(0);
 		assertThat(property.getName(), is("prop2"));
+	}
+
+	@Test
+	@Category(UnitTest.class)
+	public void shouldParseConstructorDefinition() throws Exception {
+		// Given
+		final Source xml = bean("<constructor><argument property=\"prop2\" /></constructor>");
+		// When
+		final NormalBean bean = (NormalBean) xmlParser.unmarshal(xml);
+		// Then
+		final ConstructorElement constructor = bean.getConstructor();
+		assertThat(constructor, notNullValue());
+		assertThat(constructor.getArguments(), hasSize(1));
+		assertThat(constructor.getArguments().get(0), hasProperty("propertyName", is("prop2")));
 	}
 
 

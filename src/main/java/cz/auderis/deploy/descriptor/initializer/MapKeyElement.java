@@ -17,12 +17,33 @@
 
 package cz.auderis.deploy.descriptor.initializer;
 
+import cz.auderis.deploy.descriptor.visitor.DeploymentStructureVisitor;
+import cz.auderis.deploy.descriptor.visitor.VisitableStructuralNode;
+import cz.auderis.deploy.descriptor.visitor.VisitorContext;
+
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 
 @XmlRootElement(name = "key")
 @XmlType
-public class MapKeyElement extends AbstractInitializerContentHolder {
+public class MapKeyElement extends AbstractInitializerContentHolder implements VisitableStructuralNode {
 	private static final long serialVersionUID = 20150728L;
+
+	@Override
+	public void accept(DeploymentStructureVisitor visitor, VisitorContext context) {
+		context.pushContextPart(this);
+		try {
+			final boolean parentFirst = (VisitorContext.VisitOrder.PARENT_FIRST == context.getVisitOrder());
+			if (parentFirst) {
+				visitor.visitMapKey(this);
+			}
+			acceptVisitorForContents(visitor, context);
+			if (!parentFirst) {
+				visitor.visitMapKey(this);
+			}
+		} finally {
+			context.popContextPart();
+		}
+	}
 
 }

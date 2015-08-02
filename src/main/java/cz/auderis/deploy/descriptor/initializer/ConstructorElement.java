@@ -22,12 +22,15 @@ import cz.auderis.deploy.descriptor.visitor.VisitableStructuralNode;
 import cz.auderis.deploy.descriptor.visitor.VisitorContext;
 
 import javax.xml.bind.annotation.XmlElementRef;
+import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
-@XmlType(name = "constructor")
+@XmlRootElement(name = "constructor")
+@XmlType
 public class ConstructorElement implements VisitableStructuralNode, Serializable {
 	private static final long serialVersionUID = 20150728L;
 
@@ -40,6 +43,9 @@ public class ConstructorElement implements VisitableStructuralNode, Serializable
 	}
 
 	public List<ConstructorArgumentElement> getArguments() {
+		if (null == arguments) {
+			return Collections.emptyList();
+		}
 		return arguments;
 	}
 
