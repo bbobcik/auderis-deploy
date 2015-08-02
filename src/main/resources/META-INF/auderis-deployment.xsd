@@ -1,0 +1,297 @@
+<?xml version="1.0"?>
+<!--
+  ~ Copyright 2015 Boleslav Bobcik - Auderis
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~   http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  ~
+  -->
+
+<xs:schema
+		targetNamespace="http://auderis.cz/ns/deployment/1.0"
+		xmlns="http://auderis.cz/ns/deployment/1.0"
+		xmlns:xs="http://www.w3.org/2001/XMLSchema"
+		>
+
+	<!-- Enumerations -->
+
+	<xs:simpleType name="instantiationMode" final="restriction">
+		<xs:annotation>
+			<xs:documentation>
+				Defines the time when an instance of the bean is constructed.
+			</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="OnDemand">
+				<xs:annotation>
+					<xs:documentation>
+						Instance of the bean is created only when referenced by another bean
+						that is going to be constructed.
+						(Aliases: Auto, Optional, On Demand, on-demand, Lazy)
+					</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="Always">
+				<xs:annotation>
+					<xs:documentation>
+						Instance of the bean is created unconditionally.
+						(Aliases: Required, Mandatory, Eager)
+					</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="Disabled">
+				<xs:annotation>
+					<xs:documentation>
+						Instance of the bean will never be created; the bean will behave
+						as if it wasn't defined at all.
+						(Aliases: Never, Forbidden)
+					</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+		</xs:restriction>
+	</xs:simpleType>
+
+	<xs:simpleType name="conflictResolutionMode" final="restriction">
+		<xs:annotation>
+			<xs:documentation>
+				Defines behaviour of the deployer when it processes a bean with already defined name.
+			</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="Fail">
+				<xs:annotation>
+					<xs:documentation>
+						Existence of two enabled beans with the identical name is considered
+						an error regardless whether they will be actually used or not.
+						(Aliases: Error, Strict, Forbidden)
+					</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="FailOnUse">
+				<xs:annotation>
+					<xs:documentation>
+						Existence of two enabled beans with the identical name is considered
+						an error in the case the bean name is referenced by a bean that is going
+						to be constructed.
+						(Aliases: Fail on use, fail-on-use)
+					</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="Ignore">
+				<xs:annotation>
+					<xs:documentation>
+						Subsequent attempts to redefine the bean are silently ignored, the first definition
+						will not be changed.
+						(Aliases: Skip, KeepFirst, Keep first, keep-first)
+					</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="Replace">
+				<xs:annotation>
+					<xs:documentation>
+						Subsequent definitions completely redefine the existing bean specifications, in other
+						words the last enabled definition will take effect.
+						(Aliases: KeepLast, Keep last, keep-last)
+					</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="Update">
+				<xs:annotation>
+					<xs:documentation>
+						Existing bean definition will be updated by setting properties to values specified in subsequent
+						definitions.
+						(Aliases: Override, Incremental)
+					</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+		</xs:restriction>
+	</xs:simpleType>
+
+	<xs:simpleType name="bundleSourceMode" final="restriction">
+		<xs:annotation>
+			<xs:documentation>
+				Defines the behaviour when multiple resource bundles are specified.
+			</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="First">
+				<xs:annotation>
+					<xs:documentation>
+						Only the first (according to the definition order) existing resource file
+						will be used.
+						(Aliases: Single)
+					</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="Union">
+				<xs:annotation>
+					<xs:documentation>
+						All existing resource files will be used, merging them in the way that
+						any given property will have its value from the first resource file
+						where it is defined.
+						(Aliases: Join, All)
+					</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+		</xs:restriction>
+	</xs:simpleType>
+
+	<xs:simpleType name="materializationMode" final="restriction">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="Early" />
+			<xs:enumeration value="Normal" />
+		</xs:restriction>
+	</xs:simpleType>
+
+	<!-- Simple text types -->
+
+	<xs:simpleType name="beanName">
+		<xs:restriction base="xs:NMTOKEN">
+			<xs:minLength value="1" />
+		</xs:restriction>
+	</xs:simpleType>
+
+	<xs:simpleType name="javaUnqualifiedIdentifier">
+		<xs:restriction base="xs:string">
+			<xs:pattern value="[\p{L}_$][\p{L}\p{N}_$]*" />
+		</xs:restriction>
+	</xs:simpleType>
+
+	<xs:simpleType name="javaQualifiedClassName">
+		<xs:restriction base="xs:string">
+			<xs:pattern value="([\p{L}_$][\p{L}\p{N}_$]*\.)*[\p{L}_$][\p{L}\p{N}_$]*" />
+		</xs:restriction>
+	</xs:simpleType>
+
+	<!-- Element types -->
+
+	<xs:complexType name="deploymentType">
+		<xs:choice minOccurs="0" maxOccurs="unbounded">
+			<xs:element ref="bean" />
+			<xs:element ref="list" />
+			<xs:element ref="set" />
+			<xs:element ref="map" />
+			<xs:element ref="propertyBundle" />
+		</xs:choice>
+	</xs:complexType>
+
+	<xs:complexType name="beanType" abstract="true">
+		<xs:attribute name="name" type="beanName" use="required" />
+		<xs:attribute name="mode" type="instantiationMode" use="optional" default="OnDemand" />
+		<xs:attribute name="conflict" type="conflictResolutionMode" use="optional" default="Fail" />
+	</xs:complexType>
+
+	<xs:complexType name="normalBeanType">
+		<xs:complexContent>
+			<xs:extension base="beanType">
+				<xs:sequence>
+					<xs:element ref="constructor" minOccurs="0" maxOccurs="1" />
+					<xs:element ref="property" minOccurs="0" maxOccurs="unbounded" />
+				</xs:sequence>
+				<xs:attribute name="class" type="javaQualifiedClassName" use="required" />
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+
+	<xs:complexType name="flatCollectionType">
+		<xs:complexContent>
+			<xs:extension base="beanType">
+				<xs:sequence minOccurs="0" maxOccurs="unbounded">
+					<xs:element ref="item" />
+				</xs:sequence>
+				<xs:attribute name="itemClass" type="javaQualifiedClassName" use="optional" />
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+
+	<xs:complexType name="mapCollectionType">
+		<xs:complexContent>
+			<xs:extension base="beanType">
+				<xs:sequence minOccurs="0" maxOccurs="unbounded">
+					<xs:element name="entry">
+						<xs:complexType>
+							<xs:sequence>
+								<xs:element name="key" type="injectableContentType" />
+								<xs:element name="value" type="injectableContentType" />
+							</xs:sequence>
+						</xs:complexType>
+					</xs:element>
+				</xs:sequence>
+				<xs:attribute name="keyClass" type="javaQualifiedClassName" use="optional" />
+				<xs:attribute name="valueClass" type="javaQualifiedClassName" use="optional" />
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+
+	<xs:complexType name="externalResourceType">
+		<xs:complexContent>
+			<xs:extension base="beanType">
+				<xs:attribute name="useResource" type="bundleSourceMode" use="optional" />
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+
+	<xs:complexType name="constructorType">
+		<xs:sequence minOccurs="0" maxOccurs="unbounded">
+			<xs:element ref="argument" />
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:complexType name="constructorArgumentType">
+		<xs:attribute name="property" type="javaUnqualifiedIdentifier" use="required" />
+		<xs:attribute name="class" type="javaQualifiedClassName" use="optional" />
+	</xs:complexType>
+
+	<xs:complexType name="injectableContentType" mixed="true">
+		<xs:choice minOccurs="0" maxOccurs="1">
+			<xs:element ref="inject" />
+			<xs:element ref="inject-property" />
+		</xs:choice>
+	</xs:complexType>
+
+	<xs:complexType name="propertyType">
+		<xs:complexContent>
+			<xs:extension base="injectableContentType">
+				<xs:attribute name="name" type="javaUnqualifiedIdentifier" use="required" />
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+
+	<xs:complexType name="beanInjectionType">
+		<xs:attribute name="bean" type="beanName" use="optional" />
+		<xs:attribute name="materialize" type="materializationMode" use="optional" default="Early" />
+	</xs:complexType>
+
+	<xs:complexType name="propertyInjectionType">
+		<xs:attribute name="bean" type="beanName" use="required" />
+		<xs:attribute name="property" type="javaUnqualifiedIdentifier" use="required" />
+	</xs:complexType>
+
+	<!-- Element definitions -->
+
+	<xs:element name="deployment" type="deploymentType" />
+
+	<xs:element name="bean" type="normalBeanType" />
+	<xs:element name="list" type="flatCollectionType" />
+	<xs:element name="set" type="flatCollectionType" />
+	<xs:element name="map" type="mapCollectionType" />
+	<xs:element name="propertyBundle" type="externalResourceType" />
+
+	<xs:element name="property" type="propertyType" />
+	<xs:element name="constructor" type="constructorType" />
+	<xs:element name="argument" type="constructorArgumentType" />
+	<xs:element name="item" type="injectableContentType" />
+
+	<xs:element name="inject" type="beanInjectionType" />
+	<xs:element name="inject-property" type="propertyInjectionType" />
+
+</xs:schema>

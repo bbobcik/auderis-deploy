@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright 2015 Boleslav Bobcik - Auderis
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~   http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  ~
+  -->
+
+<deployment>
+
+	<bean name="simpleBean1" class="cz.auderis.deploy.test.TestBean" >
+		<property name="textProp">Text</property>
+	</bean>
+
+	<bean name="simpleBean2" class="cz.auderis.deploy.test.TestBean" >
+		<property name="beanProp"> <inject bean="sub-bean-1" /> </property>
+	</bean>
+
+	<bean name="simpleBean3" class="cz.auderis.deploy.test.TestBean" >
+		<property name="refProp"> <inject-property bean="simpleBean1" property="textProp" /> </property>
+	</bean>
+
+	<bean name="simpleBean4" class="cz.auderis.deploy.test.TestBean" >
+		<property name="numProp">12345</property>
+		<property name="beanProp"> <inject bean="sub-bean-1" /> </property>
+		<property name="refProp"> <inject-property bean="simpleBean1" property="textProp" /> </property>
+	</bean>
+
+	<bean name="simpleBean5" class="cz.auderis.deploy.test.TestBean" >
+		<constructor>
+			<argument property="numProp" />
+		</constructor>
+		<property name="numProp">12345</property>
+		<property name="beanProp"> <inject bean="sub-bean-1" /> </property>
+		<property name="refProp"> <inject-property bean="simpleBean1" property="textProp" /> </property>
+	</bean>
+
+	<bean name="simpleBean6" class="cz.auderis.deploy.test.TestBean" >
+		<constructor>
+			<argument property="numProp" />
+			<argument property="beanProp" />
+			<argument property="refProp" />
+		</constructor>
+		<property name="numProp">12345</property>
+		<property name="beanProp"> <inject bean="sub-bean-1" /> </property>
+		<property name="refProp"> <inject-property bean="simpleBean1" property="textProp" /> </property>
+	</bean>
+
+</deployment>

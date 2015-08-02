@@ -1,20 +1,35 @@
-package cz.auderis.deploy.descriptor;
+/*
+ * Copyright 2015 Boleslav Bobcik - Auderis
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
 
-import cz.auderis.deploy.descriptor.bean.BeanConflictMode;
-import cz.auderis.deploy.descriptor.bean.BeanInstantiationMode;
-import cz.auderis.deploy.descriptor.bean.ExternalBundleBean;
-import cz.auderis.deploy.descriptor.bean.ExternalBundleSourceMode;
-import cz.auderis.deploy.descriptor.bean.NormalBean;
+package cz.auderis.deploy.descriptor.bean;
+
+
 import cz.auderis.test.category.SanityTest;
 import cz.auderis.test.category.UnitTest;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 
-import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
-import java.io.Reader;
+import javax.xml.transform.Source;
 
+import static cz.auderis.deploy.XmlSupport.createLenientParser;
+import static cz.auderis.deploy.XmlSupport.createValidatingParser;
 import static cz.auderis.deploy.XmlSupport.xml;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
@@ -27,9 +42,7 @@ public class BeanAttributeParsingTest {
 
 	@Before
 	public void initializeParser() throws Exception {
-		final String packages = DescriptorParserSupport.getJaxbContextPackages();
-		final JAXBContext jaxbCtx = JAXBContext.newInstance(packages);
-		xmlParser = jaxbCtx.createUnmarshaller();
+		xmlParser = createValidatingParser();
 	}
 
 	@Test
@@ -38,7 +51,7 @@ public class BeanAttributeParsingTest {
 		System.setProperty("auderis.deploy.lenient", Boolean.FALSE.toString());
 		for (BeanInstantiationMode mode : BeanInstantiationMode.values()) {
 			// Given
-			final Reader xml = xml("<bean name=\"x\" mode=\"" + mode.getCanonicalName() + "\" />");
+			final Source xml = xml("<bean name=\"x\" class=\"y\" mode=\"" + mode.getCanonicalName() + "\" />");
 			// When
 			final Object parsedObj = xmlParser.unmarshal(xml);
 			// Then
@@ -59,13 +72,12 @@ public class BeanAttributeParsingTest {
 				if (name.equals(mode.getCanonicalName())) {
 					continue;
 				}
-				final Reader xml = xml("<bean name=\"x\" mode=\"" + name + "\" />");
+				final Source xml = xml("<bean name=\"x\" class=\"y\" mode=\"" + name + "\" />");
 				// When
-				final Object parsedObj;
 				try {
-					parsedObj = xmlParser.unmarshal(xml);
+					xmlParser.unmarshal(xml);
 					fail("Parsed despite invalid name " + name + " for mode " + mode);
-				} catch (DescriptorParsingException e) {
+				} catch (JAXBException e) {
 					// ok
 				}
 			}
@@ -76,11 +88,12 @@ public class BeanAttributeParsingTest {
 	@Category({ UnitTest.class, SanityTest.class })
 	public void shouldParseBeanInstantiationModeAliasesInLenientMode() throws Exception {
 		System.setProperty("auderis.deploy.lenient", Boolean.TRUE.toString());
+		xmlParser = createLenientParser();
 		for (BeanInstantiationMode mode : BeanInstantiationMode.values()) {
 			for (final String name : mode.getRecognizedNames()) {
 				// Given
 				// Add spaces on both sides and convert to uppercase
-				final Reader xml = xml("<bean name=\"x\" mode=\" " + name.toUpperCase() + " \" />");
+				final Source xml = xml("<bean name=\"x\" class=\"y\" mode=\" " + name.toUpperCase() + " \" />");
 				// When
 				final Object parsedObj = xmlParser.unmarshal(xml);
 				assertThat(parsedObj, instanceOf(NormalBean.class));
@@ -97,7 +110,7 @@ public class BeanAttributeParsingTest {
 		System.setProperty("auderis.deploy.lenient", Boolean.FALSE.toString());
 		for (BeanConflictMode mode : BeanConflictMode.values()) {
 			// Given
-			final Reader xml = xml("<bean name=\"x\" conflict=\"" + mode.getCanonicalName() + "\" />");
+			final Source xml = xml("<bean name=\"x\" class=\"y\" conflict=\"" + mode.getCanonicalName() + "\" />");
 			// When
 			final Object parsedObj = xmlParser.unmarshal(xml);
 			// Then
@@ -118,13 +131,12 @@ public class BeanAttributeParsingTest {
 				if (name.equals(mode.getCanonicalName())) {
 					continue;
 				}
-				final Reader xml = xml("<bean name=\"x\" conflict=\"" + name + "\" />");
+				final Source xml = xml("<bean name=\"x\" class=\"y\" conflict=\"" + name + "\" />");
 				// When
-				final Object parsedObj;
 				try {
-					parsedObj = xmlParser.unmarshal(xml);
+					xmlParser.unmarshal(xml);
 					fail("Parsed despite invalid name " + name + " for mode " + mode);
-				} catch (DescriptorParsingException e) {
+				} catch (JAXBException e) {
 					// ok
 				}
 			}
@@ -135,11 +147,12 @@ public class BeanAttributeParsingTest {
 	@Category({ UnitTest.class, SanityTest.class })
 	public void shouldParseBeanConflictModeAliasesInLenientMode() throws Exception {
 		System.setProperty("auderis.deploy.lenient", Boolean.TRUE.toString());
+		xmlParser = createLenientParser();
 		for (BeanConflictMode mode : BeanConflictMode.values()) {
 			for (final String name : mode.getRecognizedNames()) {
 				// Given
 				// Add spaces on both sides and convert to uppercase
-				final Reader xml = xml("<bean name=\"x\" conflict=\" " + name.toUpperCase() + " \" />");
+				final Source xml = xml("<bean name=\"x\" class=\"y\" conflict=\" " + name.toUpperCase() + " \" />");
 				// When
 				final Object parsedObj = xmlParser.unmarshal(xml);
 				assertThat(parsedObj, instanceOf(NormalBean.class));
@@ -156,7 +169,7 @@ public class BeanAttributeParsingTest {
 		System.setProperty("auderis.deploy.lenient", Boolean.FALSE.toString());
 		for (ExternalBundleSourceMode mode : ExternalBundleSourceMode.values()) {
 			// Given
-			final Reader xml = xml("<propertyBundle name=\"x\" useResource=\"" + mode.getCanonicalName() + "\" />");
+			final Source xml = xml("<propertyBundle name=\"x\" useResource=\"" + mode.getCanonicalName() + "\" />");
 			// When
 			final Object parsedObj = xmlParser.unmarshal(xml);
 			// Then
@@ -177,13 +190,12 @@ public class BeanAttributeParsingTest {
 				if (name.equals(mode.getCanonicalName())) {
 					continue;
 				}
-				final Reader xml = xml("<propertyBundle name=\"x\" useResource=\"" + name + "\" />");
+				final Source xml = xml("<propertyBundle name=\"x\" useResource=\"" + name + "\" />");
 				// When
-				final Object parsedObj;
 				try {
-					parsedObj = xmlParser.unmarshal(xml);
+					xmlParser.unmarshal(xml);
 					fail("Parsed despite invalid name " + name + " for mode " + mode);
-				} catch (DescriptorParsingException e) {
+				} catch (JAXBException e) {
 					// ok
 				}
 			}
@@ -194,11 +206,13 @@ public class BeanAttributeParsingTest {
 	@Category({ UnitTest.class, SanityTest.class })
 	public void shouldParseBundleSourceModeAliasesInLenientMode() throws Exception {
 		System.setProperty("auderis.deploy.lenient", Boolean.TRUE.toString());
+		xmlParser = createLenientParser();
+		//
 		for (ExternalBundleSourceMode mode : ExternalBundleSourceMode.values()) {
 			for (final String name : mode.getRecognizedNames()) {
 				// Given
 				// Add spaces on both sides and convert to uppercase
-				final Reader xml = xml("<propertyBundle name=\"x\" useResource=\" " + name.toUpperCase() + " \" />");
+				final Source xml = xml("<propertyBundle name=\"x\" useResource=\" " + name.toUpperCase() + " \" />");
 				// When
 				final Object parsedObj = xmlParser.unmarshal(xml);
 				assertThat(parsedObj, instanceOf(ExternalBundleBean.class));

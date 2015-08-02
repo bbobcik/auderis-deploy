@@ -1,6 +1,26 @@
+/*
+ * Copyright 2015 Boleslav Bobcik - Auderis
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
+
 package cz.auderis.deploy.descriptor.bean;
 
 import cz.auderis.deploy.descriptor.initializer.MapEntryElement;
+import cz.auderis.deploy.descriptor.visitor.DeploymentStructureVisitor;
+import cz.auderis.deploy.descriptor.visitor.DeploymentVisitor;
+import cz.auderis.deploy.descriptor.visitor.VisitorContext;
 
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElementRef;
@@ -25,14 +45,10 @@ public class StandaloneMapBean extends StandaloneCollectionBean {
 	protected List<MapEntryElement> entries;
 
 	public StandaloneMapBean() {
+		super(BeanType.MAP);
 		this.keyClassName = String.class.getName();
 		this.valueClassName = Object.class.getName();
 		this.entries = new ArrayList<MapEntryElement>(1);
-	}
-
-	@Override
-	public BeanType getBeanType() {
-		return BeanType.MAP;
 	}
 
 	@Override
@@ -46,6 +62,31 @@ public class StandaloneMapBean extends StandaloneCollectionBean {
 
 	public String getValueClassName() {
 		return valueClassName;
+	}
+
+	@Override
+	public void accept(DeploymentVisitor visitor, VisitorContext context) {
+		context.pushContextPart(this);
+		try {
+			if (visitor instanceof DeploymentStructureVisitor) {
+				final DeploymentStructureVisitor structVisitor = (DeploymentStructureVisitor) visitor;
+				final boolean parentFirst = (VisitorContext.VisitOrder.PARENT_FIRST == context.getVisitOrder());
+				if (parentFirst) {
+					visitor.visitMapBean(this);
+				}
+				for (final MapEntryElement entry : entries) {
+					entry.accept(structVisitor, context);
+				}
+				if (!parentFirst) {
+					visitor.visitMapBean(this);
+				}
+			} else {
+				visitor.visitMapBean(this);
+			}
+
+		} finally {
+			context.popContextPart();
+		}
 	}
 
 	@Override
