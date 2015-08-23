@@ -37,7 +37,7 @@ public class ConstructorArgumentElement implements VisitableStructuralNode, Seri
 	@XmlAttribute(name = "class", required = false)
 	protected String argumentClass;
 
-	protected transient PropertyElement referencedProperty;
+	protected PropertyElement referencedProperty;
 
 	public ConstructorArgumentElement() {
 		super();

@@ -1,3 +1,4 @@
 AbstractInjectionElement
 BeanInjectionElement
+ExtraDependency
 PropertyInjectionElement

@@ -19,10 +19,14 @@ package cz.auderis.deploy.descriptor.bean;
 
 import cz.auderis.deploy.descriptor.DeploymentEntry;
 import cz.auderis.deploy.descriptor.DescriptorParsingException;
+import cz.auderis.deploy.descriptor.dependency.DependencyInstance;
 
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlID;
 import javax.xml.bind.annotation.XmlTransient;
+import java.util.Collections;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 import static cz.auderis.deploy.descriptor.DescriptorParserSupport.isBlank;
 import static cz.auderis.deploy.descriptor.DescriptorParserSupport.isStrictParsingEnabled;
@@ -44,13 +48,16 @@ public abstract class AbstractBean extends DeploymentEntry {
 	@XmlTransient
 	protected final BeanType beanType;
 
-	public AbstractBean(BeanType type) {
+	protected final Set<DependencyInstance> dependencies;
+
+	protected AbstractBean(BeanType type) {
 		if (null == type) {
 			throw new NullPointerException();
 		}
 		this.beanType = type;
 		this.instantiationMode = BeanInstantiationMode.getDefaultMode();
 		this.conflictResolutionMode = BeanConflictMode.getDefaultMode();
+		this.dependencies = new LinkedHashSet<DependencyInstance>(2);
 	}
 
 	protected AbstractBean(String name, BeanType type, BeanInstantiationMode instMode, BeanConflictMode conflictMode) {
@@ -62,6 +69,7 @@ public abstract class AbstractBean extends DeploymentEntry {
 		this.beanType = type;
 		this.instantiationMode = instMode;
 		this.conflictResolutionMode = conflictMode;
+		this.dependencies = new LinkedHashSet<DependencyInstance>(2);
 	}
 
 	public String getName() {
@@ -80,6 +88,25 @@ public abstract class AbstractBean extends DeploymentEntry {
 
 	public BeanConflictMode getConflictResolutionMode() {
 		return conflictResolutionMode;
+	}
+
+	public boolean hasIndividualProperties() {
+		return beanType.hasIndividualProperties();
+	}
+
+	public Set<DependencyInstance> getDependencies() {
+		return Collections.unmodifiableSet(dependencies);
+	}
+
+	public void addDependency(DependencyInstance dep) {
+		if (null == dep) {
+			throw new NullPointerException();
+		}
+		dependencies.add(dep);
+	}
+
+	public void removeDependency(DependencyInstance dep) {
+		dependencies.remove(dep);
 	}
 
 	@XmlAttribute(name = "mode")

@@ -15,14 +15,5 @@
  *
  */
 
-package cz.auderis.deploy.descriptor.initializer;
+package cz.auderis.deploy.processor.compiler;
 
-import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlType;
-
-@XmlRootElement(name = "key")
-@XmlType
-public class MapKeyElement extends AbstractInitializerContentHolder implements InjectionPlace {
-	private static final long serialVersionUID = 20150728L;
-
-}

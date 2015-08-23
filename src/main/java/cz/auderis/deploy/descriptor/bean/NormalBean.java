@@ -17,6 +17,7 @@
 
 package cz.auderis.deploy.descriptor.bean;
 
+import cz.auderis.deploy.descriptor.dependency.ExtraDependency;
 import cz.auderis.deploy.descriptor.initializer.ConstructorElement;
 import cz.auderis.deploy.descriptor.initializer.PropertyElement;
 import cz.auderis.deploy.descriptor.visitor.DeploymentStructureVisitor;
@@ -45,10 +46,14 @@ public class NormalBean extends AbstractBean {
 	@XmlElementRef(type = PropertyElement.class, required = false)
 	protected List<PropertyElement> properties;
 
+	@XmlElementRef(type = ExtraDependency.class, required = false)
+	protected List<ExtraDependency> extraDependencies;
+
 	public NormalBean() {
 		super(BeanType.NORMAL);
 		this.beanClass = Void.class.getName();
 		this.properties = new ArrayList<PropertyElement>(1);
+		this.extraDependencies = new ArrayList<ExtraDependency>(1);
 	}
 
 	@Override
@@ -79,6 +84,9 @@ public class NormalBean extends AbstractBean {
 				}
 				if (null != constructor) {
 					constructor.accept(structVisitor, context);
+				}
+				for (final ExtraDependency extraDependency : extraDependencies) {
+					extraDependency.accept(structVisitor, context);
 				}
 				if (!parentFirst) {
 					visitor.visitNormalBean(this);

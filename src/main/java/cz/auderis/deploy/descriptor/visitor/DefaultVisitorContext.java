@@ -29,7 +29,6 @@ public class DefaultVisitorContext implements VisitorContext, Serializable {
 	private static final long serialVersionUID = -1406613205937411284L;
 
 	final VisitOrder visitOrder;
-	AbstractBean currentBean;
 	final Deque<Object> context;
 	final List<?> contextView;
 
@@ -39,7 +38,6 @@ public class DefaultVisitorContext implements VisitorContext, Serializable {
 
 	public DefaultVisitorContext(VisitOrder order) {
 		this.visitOrder = (null != order) ? order : VisitOrder.PARENT_LAST;
-		this.currentBean = null;
 		final LinkedList<Object> contextList = new LinkedList<Object>();
 		this.context = contextList;
 		this.contextView = Collections.unmodifiableList(contextList);
@@ -52,7 +50,7 @@ public class DefaultVisitorContext implements VisitorContext, Serializable {
 
 	@Override
 	public AbstractBean getCurrentBean() {
-		return currentBean;
+		return getTopContextPart(AbstractBean.class);
 	}
 
 	@Override
@@ -69,22 +67,29 @@ public class DefaultVisitorContext implements VisitorContext, Serializable {
 	}
 
 	@Override
+	public <T> T getTopContextPart(Class<T> partType) {
+		if (null == partType) {
+			throw new NullPointerException();
+		}
+		for (final Object ctxPart : context) {
+			if (partType.isInstance(ctxPart)) {
+				return partType.cast(ctxPart);
+			}
+		}
+		return null;
+	}
+
+	@Override
 	public void pushContextPart(Object ctxPart) {
 		if (null == ctxPart) {
 			throw new NullPointerException();
 		}
 		context.push(ctxPart);
-		if (ctxPart instanceof AbstractBean) {
-			currentBean = (AbstractBean) ctxPart;
-		}
 	}
 
 	@Override
 	public void popContextPart() {
 		final Object removedPart = context.pop();
-		if (removedPart == currentBean) {
-			currentBean = null;
-		}
 	}
 
 }

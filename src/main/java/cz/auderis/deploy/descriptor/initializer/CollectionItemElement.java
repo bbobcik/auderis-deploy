@@ -17,25 +17,67 @@
 
 package cz.auderis.deploy.descriptor.initializer;
 
+import cz.auderis.deploy.descriptor.DescriptorParsingException;
 import cz.auderis.deploy.descriptor.visitor.DeploymentStructureVisitor;
 import cz.auderis.deploy.descriptor.visitor.VisitableStructuralNode;
 import cz.auderis.deploy.descriptor.visitor.VisitorContext;
 
+import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.XmlType;
+
+import static cz.auderis.deploy.descriptor.DescriptorParserSupport.isBlank;
+import static cz.auderis.deploy.descriptor.DescriptorParserSupport.isStrictParsingEnabled;
+import static cz.auderis.deploy.descriptor.DescriptorParserSupport.parseEnumByName;
 
 @XmlRootElement(name = "item")
 @XmlType
-public class CollectionItemElement extends AbstractInitializerContentHolder implements VisitableStructuralNode {
+public class CollectionItemElement extends AbstractInitializerContentHolder implements VisitableStructuralNode, InjectionPlace {
 	private static final long serialVersionUID = 20150728L;
+
+	@XmlTransient
+	protected CollectionItemDependencyMode itemDependencyMode;
+
+	public CollectionItemElement() {
+		super();
+		itemDependencyMode = CollectionItemDependencyMode.getDefaultMode();
+	}
+
+	public CollectionItemDependencyMode getDependencyMode() {
+		return itemDependencyMode;
+	}
 
 	@Override
 	public void accept(DeploymentStructureVisitor visitor, VisitorContext context) {
 		context.pushContextPart(this);
 		try {
-			visitor.visitCollectionItem(this);
+			final boolean parentFirst = (VisitorContext.VisitOrder.PARENT_FIRST == context.getVisitOrder());
+			if (parentFirst) {
+				visitor.visitCollectionItem(this);
+			}
+			acceptVisitorForContents(visitor, context);
+			if (!parentFirst) {
+				visitor.visitCollectionItem(this);
+			}
 		} finally {
 			context.popContextPart();
+		}
+	}
+
+	@XmlAttribute(name = "dependencyMode")
+	protected final String getItemDependencyModeCode() {
+		return itemDependencyMode.getCanonicalName();
+	}
+
+	protected final void setItemDependencyModeCode(String modeCode) {
+		final CollectionItemDependencyMode mode = parseEnumByName(modeCode, CollectionItemDependencyMode.class);
+		if (null != mode) {
+			this.itemDependencyMode = mode;
+		} else if (isBlank(modeCode) && !isStrictParsingEnabled()) {
+			this.itemDependencyMode = CollectionItemDependencyMode.getDefaultMode();
+		} else {
+			throw new DescriptorParsingException("Invalid item dependency mode '" + modeCode + "'");
 		}
 	}
 

@@ -29,4 +29,11 @@ public enum BeanType {
 
 	EXTERNAL_BUNDLE
 
+	;
+
+	public boolean hasIndividualProperties() {
+		return (this == NORMAL) || (this == EXTERNAL_BUNDLE);
+	}
+
+
 }

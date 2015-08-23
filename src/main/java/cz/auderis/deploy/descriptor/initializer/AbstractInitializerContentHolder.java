@@ -27,6 +27,7 @@ import javax.xml.bind.annotation.XmlElementRef;
 import javax.xml.bind.annotation.XmlElementRefs;
 import javax.xml.bind.annotation.XmlMixed;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 public abstract class AbstractInitializerContentHolder implements Serializable {
@@ -39,15 +40,33 @@ public abstract class AbstractInitializerContentHolder implements Serializable {
 	})
 	protected List<Object> contents;
 
+	private InitializerContentType contentType;
+
+	protected AbstractInitializerContentHolder() {
+		contents = new ArrayList<Object>(1);
+	}
+
 	public List<Object> getContents() {
 		return contents;
 	}
 
+	public InitializerContentType getContentType() {
+		assert null != contentType : "Content type was not yet determined";
+		return contentType;
+	}
+
+	public void setContentType(InitializerContentType contentType) {
+		if (null == contentType) {
+			throw new NullPointerException();
+		}
+		this.contentType = contentType;
+	}
 
 	protected void acceptVisitorForContents(DeploymentStructureVisitor visitor, VisitorContext context) {
-		if (null == context) {
+		if (null == contents) {
 			return;
 		}
+		// Context manipulation should be done in concrete class implementation
 		for (final Object item : contents) {
 			if (item instanceof String) {
 				visitor.visitStringValue((String) item);

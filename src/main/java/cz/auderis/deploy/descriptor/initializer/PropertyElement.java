@@ -27,7 +27,7 @@ import javax.xml.bind.annotation.XmlType;
 
 @XmlRootElement(name = "property")
 @XmlType
-public class PropertyElement extends AbstractInitializerContentHolder implements VisitableStructuralNode {
+public class PropertyElement extends AbstractInitializerContentHolder implements VisitableStructuralNode, InjectionPlace {
 	private static final long serialVersionUID = 20150728L;
 
 	@XmlAttribute(name = "name", required = true)

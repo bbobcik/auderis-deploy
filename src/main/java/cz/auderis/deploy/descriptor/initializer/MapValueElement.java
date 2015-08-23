@@ -22,7 +22,7 @@ import javax.xml.bind.annotation.XmlType;
 
 @XmlRootElement(name = "value")
 @XmlType
-public class MapValueElement extends AbstractInitializerContentHolder {
+public class MapValueElement extends AbstractInitializerContentHolder implements InjectionPlace {
 	private static final long serialVersionUID = 20150728L;
 
 }

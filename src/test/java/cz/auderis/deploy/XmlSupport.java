@@ -39,6 +39,10 @@ public final class XmlSupport {
 		return filteredSource;
 	}
 
+	public static String cdata(String text) {
+		return "<![CDATA[" + text + "]]>";
+	}
+
 	public static Unmarshaller createValidatingParser() throws JAXBException {
 		final String packages = DescriptorParserSupport.getJaxbContextPackages();
 		final JAXBContext jaxbCtx = JAXBContext.newInstance(packages);
