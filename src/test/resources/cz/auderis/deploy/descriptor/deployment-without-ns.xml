@@ -59,13 +59,13 @@
 	<list name="simpleList">
 		<item>Abc</item>
 		<item><inject bean="Xyz"/></item>
-		<item><inject-property bean="Abc" property="prop" /></item>
+		<item><injectProperty bean="Abc" property="prop" /></item>
 	</list>
 
 	<set name="simpleSet">
 		<item>Abc</item>
 		<item><inject bean="Xyz"/></item>
-		<item><inject-property bean="Abc" property="prop" /></item>
+		<item><injectProperty bean="Abc" property="prop" /></item>
 	</set>
 
 	<map name="simpleMap">

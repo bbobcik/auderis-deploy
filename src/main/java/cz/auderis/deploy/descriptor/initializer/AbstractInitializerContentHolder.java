@@ -28,7 +28,11 @@ import javax.xml.bind.annotation.XmlElementRefs;
 import javax.xml.bind.annotation.XmlMixed;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+
+import static cz.auderis.deploy.descriptor.initializer.InitializerContentType.TEXT;
+import static cz.auderis.deploy.descriptor.initializer.InitializerContentType.determineTypeFromMixedContents;
 
 public abstract class AbstractInitializerContentHolder implements Serializable {
 	private static final long serialVersionUID = 20150728L;
@@ -62,11 +66,51 @@ public abstract class AbstractInitializerContentHolder implements Serializable {
 		this.contentType = contentType;
 	}
 
+	public void normalizeContents() {
+		if (null == contents) {
+			contents = Collections.emptyList();
+			contentType = TEXT;
+			return;
+		}
+		if (null == contentType) {
+			contentType = determineTypeFromMixedContents(contents);
+		}
+		switch (contentType) {
+			case TEXT: {
+				final StringBuilder str = new StringBuilder(64);
+				for (final Object contentPart : contents) {
+					str.append(contentPart.toString());
+				}
+				contents = Collections.singletonList((Object) str.toString());
+				break;
+			}
+
+			case BEAN:
+				// Fall through to BEAN_PROPERTY
+			case BEAN_PROPERTY: {
+				List<Object> replacementList = null;
+				PART_SCAN:
+				for (final Object contentPart : contents) {
+					if ((null != contentPart) && !(contentPart instanceof String)) {
+						replacementList = Collections.singletonList(contentPart);
+						break PART_SCAN;
+					}
+				}
+				assert null != replacementList;
+				contents = replacementList;
+				break;
+			}
+
+			default:
+				throw new AssertionError();
+		}
+	}
+
 	protected void acceptVisitorForContents(DeploymentStructureVisitor visitor, VisitorContext context) {
+		// Context manipulation should be done in concrete class implementation
 		if (null == contents) {
 			return;
 		}
-		// Context manipulation should be done in concrete class implementation
 		for (final Object item : contents) {
 			if (item instanceof String) {
 				visitor.visitStringValue((String) item);

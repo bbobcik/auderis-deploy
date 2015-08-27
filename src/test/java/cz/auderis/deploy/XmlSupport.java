@@ -44,7 +44,6 @@ public final class XmlSupport {
 		return filteredSource;
 	}
 
-
 	public static Source xml(Class<?> baseClass, String resourceName) throws SAXException {
 		final InputStream resourceStream = baseClass.getResourceAsStream(resourceName);
 		final InputSource baseSource = new InputSource(resourceStream);

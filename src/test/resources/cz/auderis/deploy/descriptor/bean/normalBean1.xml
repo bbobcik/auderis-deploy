@@ -21,5 +21,5 @@
 	<property name="prop2">12345</property>
 	<property name="prop3">true</property>
 	<property name="prop4"> <inject bean="sub-bean-1" /> </property>
-	<property name="prop5"> <inject-property bean="sub-bean-2" property="subPropA" /> </property>
+	<property name="prop5"> <injectProperty bean="sub-bean-2" property="subPropA" /> </property>
 </bean>

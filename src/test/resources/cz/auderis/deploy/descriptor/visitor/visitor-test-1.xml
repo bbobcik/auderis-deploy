@@ -23,17 +23,17 @@
 	</bean>
 
 	<bean name="simpleBean2" class="cz.auderis.deploy.test.TestBean" >
-		<property name="beanProp"> <inject bean="sub-bean-1" /> </property>
+		<property name="beanProp"><inject bean="sub-bean-1" /></property>
 	</bean>
 
 	<bean name="simpleBean3" class="cz.auderis.deploy.test.TestBean" >
-		<property name="refProp"> <inject-property bean="simpleBean1" property="textProp" /> </property>
+		<property name="refProp"><injectProperty bean="simpleBean1" property="textProp" /></property>
 	</bean>
 
 	<bean name="simpleBean4" class="cz.auderis.deploy.test.TestBean" >
 		<property name="numProp">12345</property>
-		<property name="beanProp"> <inject bean="sub-bean-1" /> </property>
-		<property name="refProp"> <inject-property bean="simpleBean1" property="textProp" /> </property>
+		<property name="beanProp"><inject bean="sub-bean-1" /></property>
+		<property name="refProp"><injectProperty bean="simpleBean1" property="textProp" /></property>
 	</bean>
 
 	<bean name="complexBean1" class="cz.auderis.deploy.test.TestBean" >
@@ -41,8 +41,8 @@
 			<argument property="numProp" />
 		</constructor>
 		<property name="numProp">12345</property>
-		<property name="beanProp"> <inject bean="sub-bean-1" /> </property>
-		<property name="refProp"> <inject-property bean="simpleBean1" property="textProp" /> </property>
+		<property name="beanProp"><inject bean="sub-bean-1" /></property>
+		<property name="refProp"><injectProperty bean="simpleBean1" property="textProp" /></property>
 	</bean>
 
 	<bean name="complexBean2" class="cz.auderis.deploy.test.TestBean" >
@@ -52,20 +52,20 @@
 			<argument property="refProp" />
 		</constructor>
 		<property name="numProp">12345</property>
-		<property name="beanProp"> <inject bean="sub-bean-1" /> </property>
-		<property name="refProp"> <inject-property bean="simpleBean1" property="textProp" /> </property>
+		<property name="beanProp"><inject bean="sub-bean-1" /></property>
+		<property name="refProp"><injectProperty bean="simpleBean1" property="textProp" /></property>
 	</bean>
 
 	<list name="simpleList">
 		<item>Abc</item>
 		<item><inject bean="Xyz"/></item>
-		<item><inject-property bean="Abc" property="prop" /></item>
+		<item><injectProperty bean="Abc" property="prop" /></item>
 	</list>
 
 	<set name="simpleSet">
 		<item>Abc</item>
 		<item><inject bean="Xyz"/></item>
-		<item><inject-property bean="Abc" property="prop" /></item>
+		<item><injectProperty bean="Abc" property="prop" /></item>
 	</set>
 
 	<map name="simpleMap">
