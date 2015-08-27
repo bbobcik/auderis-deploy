@@ -18,6 +18,8 @@
 package cz.auderis.deploy;
 
 import cz.auderis.deploy.descriptor.DescriptorParserSupport;
+import junitparams.converters.ConversionFailedException;
+import junitparams.converters.ParamConverter;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
@@ -28,6 +30,8 @@ import javax.xml.transform.Source;
 import javax.xml.validation.Schema;
 import java.io.InputStream;
 import java.io.StringReader;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public final class XmlSupport {
 
@@ -62,6 +66,36 @@ public final class XmlSupport {
 		final JAXBContext jaxbCtx = JAXBContext.newInstance(packages);
 		final Unmarshaller xmlParser = jaxbCtx.createUnmarshaller();
 		return xmlParser;
+	}
+
+	public static class SourceConverter implements ParamConverter<Source> {
+		private static final Pattern WRAP_PATTERN = Pattern.compile("(.*)\\{\\}(.*)");
+		private static final Pattern ID_PATTERN = Pattern.compile("[a-z][a-z0-9_-]*");
+
+		@Override
+		public Source convert(Object obj, String option) throws ConversionFailedException {
+			final String xmlText = prepareXmlText(obj.toString(), option);
+			try {
+				return xml(xmlText);
+			} catch (SAXException e) {
+				throw new ConversionFailedException(e.getMessage());
+			}
+		}
+
+		private static String prepareXmlText(String baseText, String option) {
+			if ((null == option) || option.trim().isEmpty()) {
+				return baseText;
+			}
+			final Matcher matcher = WRAP_PATTERN.matcher(option);
+			if (matcher.matches()) {
+				return matcher.group(1) + baseText + matcher.group(2);
+			}
+			matcher.usePattern(ID_PATTERN).reset();
+			if (matcher.matches()) {
+				return "<" + option + '>' + baseText + "</" + option + '>';
+			}
+			return baseText;
+		}
 	}
 
 }

@@ -17,11 +17,16 @@
 
 package cz.auderis.deploy.descriptor.bean;
 
+import cz.auderis.deploy.XmlSupport;
 import cz.auderis.test.category.SanityTest;
 import cz.auderis.test.category.UnitTest;
+import junitparams.JUnitParamsRunner;
+import junitparams.Parameters;
+import junitparams.converters.ConvertParam;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
+import org.junit.runner.RunWith;
 
 import javax.xml.bind.Unmarshaller;
 import javax.xml.transform.Source;
@@ -33,6 +38,7 @@ import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 
+@RunWith(JUnitParamsRunner.class)
 public class BasicBeanParsingTest {
 
 	private Unmarshaller xmlParser;
@@ -44,17 +50,22 @@ public class BasicBeanParsingTest {
 
 	@Test
 	@Category({ UnitTest.class, SanityTest.class })
-	public void shouldParseEmptyNormalBean() throws Exception {
-		// Given
-		final Source xml = xml("<bean name=\"xyz\" class=\"java.lang.Object\" ></bean>");
+	@Parameters({
+			"<bean name=\"xyz\" class=\"java.lang.Object\" ></bean> | xyz | java.lang.Object"
+	})
+	public void shouldParseEmptyNormalBean(
+			@ConvertParam(XmlSupport.SourceConverter.class) Source xml,
+			String expectedName,
+			String expectedClass
+	) throws Exception {
 		// When
 		final Object parsedObj = xmlParser.unmarshal(xml);
 		// Then
 		assertThat(parsedObj, instanceOf(NormalBean.class));
 		final NormalBean bean = (NormalBean) parsedObj;
-		assertThat(bean, hasProperty("name", is("xyz")));
+		assertThat(bean, hasProperty("name", is(expectedName)));
 		assertThat(bean, hasProperty("beanType", is(BeanType.NORMAL)));
-		assertThat(bean, hasProperty("beanClassName", is("java.lang.Object")));
+		assertThat(bean, hasProperty("beanClassName", is(expectedClass)));
 	}
 
 	@Test

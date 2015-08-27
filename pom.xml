@@ -58,6 +58,10 @@
 
 	<dependencies>
 		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-api</artifactId>
+		</dependency>
+		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
 		</dependency>
@@ -70,6 +74,14 @@
 			<artifactId>auderis-test-category</artifactId>
 		</dependency>
 		<dependency>
+			<groupId>cz.auderis</groupId>
+			<artifactId>auderis-test-extra</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>pl.pragmatists</groupId>
+			<artifactId>JUnitParams</artifactId>
+		</dependency>
+		<dependency>
 			<groupId>org.mockito</groupId>
 			<artifactId>mockito-all</artifactId>
 		</dependency>
@@ -77,6 +89,12 @@
 
 	<dependencyManagement>
 		<dependencies>
+			<dependency>
+				<groupId>org.slf4j</groupId>
+				<artifactId>slf4j-api</artifactId>
+				<version>1.7.7</version>
+				<scope>compile</scope>
+			</dependency>
 			<dependency>
 				<groupId>junit</groupId>
 				<artifactId>junit</artifactId>
@@ -102,9 +120,21 @@
 				<scope>test</scope>
 			</dependency>
 			<dependency>
+				<groupId>cz.auderis</groupId>
+				<artifactId>auderis-test-extra</artifactId>
+				<version>1.0.1-SNAPSHOT</version>
+				<scope>test</scope>
+			</dependency>
+			<dependency>
 				<groupId>org.mockito</groupId>
 				<artifactId>mockito-all</artifactId>
 				<version>1.10.19</version>
+				<scope>test</scope>
+			</dependency>
+			<dependency>
+				<groupId>pl.pragmatists</groupId>
+				<artifactId>JUnitParams</artifactId>
+				<version>1.0.4</version>
 				<scope>test</scope>
 			</dependency>
 		</dependencies>
