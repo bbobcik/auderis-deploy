@@ -26,7 +26,7 @@ import javax.xml.bind.annotation.XmlType;
 
 @XmlRootElement(name = "key")
 @XmlType
-public class MapKeyElement extends AbstractInitializerContentHolder implements VisitableStructuralNode {
+public class MapKeyElement extends AbstractInitializerContentHolder implements VisitableStructuralNode, InjectionPlace {
 	private static final long serialVersionUID = 20150728L;
 
 	@Override

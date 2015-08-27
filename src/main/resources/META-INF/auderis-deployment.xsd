@@ -27,7 +27,7 @@
 	<xs:simpleType name="instantiationMode" final="restriction">
 		<xs:annotation>
 			<xs:documentation>
-				Defines the time when an instance of the bean is constructed.
+				Defines a condition that determines whether an instance of the bean is constructed.
 			</xs:documentation>
 		</xs:annotation>
 		<xs:restriction base="xs:string">
@@ -146,9 +146,60 @@
 	</xs:simpleType>
 
 	<xs:simpleType name="materializationMode" final="restriction">
+		<xs:annotation>
+			<xs:documentation>
+				Defines when and how the actual bean injection is performed.
+			</xs:documentation>
+		</xs:annotation>
 		<xs:restriction base="xs:string">
-			<xs:enumeration value="Early" />
-			<xs:enumeration value="Normal" />
+			<xs:enumeration value="Early">
+				<xs:annotation>
+					<xs:documentation>
+						The bean will be injected as soon as its instance is created, i.e. typically
+						when its constructor has been called. The injected bean may not be fully initialized.
+						(Alias: Constructed)
+					</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="Normal">
+				<xs:annotation>
+					<xs:documentation>
+						The bean is injected only after full initialization is performed, i.e. its instance
+						is constructed, all properties are set and its appropriate lifecycle method has been
+						called.
+						(Alias: Initialized)
+					</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+		</xs:restriction>
+	</xs:simpleType>
+
+	<xs:simpleType name="collectionMode" final="restriction">
+		<xs:annotation>
+			<xs:documentation>
+				Defines how collection items that are bean references will be handled.
+			</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="Normal">
+				<xs:annotation>
+					<xs:documentation>
+						When a bean is an item of a collection, it will serve as a "hard" reference,
+						causing the bean to be instantiated even if it is not referenced from any
+						other place.
+					</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="SkipMissing" >
+				<xs:annotation>
+					<xs:documentation>
+						A bean specified as an item of this collection, that is not being constructed
+						(either when its instantiation mode is "Disabled" or when it is not referenced
+						from any other place and its instantiation mode is "OnDemand"), will be ignored.
+						(Aliases: Skip Missing, skip-missing)
+					</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
 		</xs:restriction>
 	</xs:simpleType>
 
@@ -196,6 +247,7 @@
 				<xs:sequence>
 					<xs:element ref="constructor" minOccurs="0" maxOccurs="1" />
 					<xs:element ref="property" minOccurs="0" maxOccurs="unbounded" />
+					<xs:element ref="start" minOccurs="0" maxOccurs="1" />
 				</xs:sequence>
 				<xs:attribute name="class" type="javaQualifiedClassName" use="required" />
 			</xs:extension>
@@ -247,8 +299,16 @@
 	<xs:complexType name="injectableContentType" mixed="true">
 		<xs:choice minOccurs="0" maxOccurs="1">
 			<xs:element ref="inject" />
-			<xs:element ref="inject-property" />
+			<xs:element ref="injectProperty" />
 		</xs:choice>
+	</xs:complexType>
+
+	<xs:complexType name="flatCollectionItemType" mixed="true">
+		<xs:complexContent>
+			<xs:extension base="injectableContentType">
+				<xs:attribute name="dependencyMode" type="collectionMode" use="optional" default="Normal" />
+			</xs:extension>
+		</xs:complexContent>
 	</xs:complexType>
 
 	<xs:complexType name="propertyType">
@@ -276,6 +336,15 @@
 		<xs:attribute name="property" type="javaUnqualifiedIdentifier" use="required" />
 	</xs:complexType>
 
+	<xs:complexType name="lifecycleMethodType">
+		<xs:attribute name="method" type="javaUnqualifiedIdentifier" use="optional" />
+		<xs:attribute name="allow" type="xs:boolean" use="optional" default="true" />
+	</xs:complexType>
+
+	<xs:complexType name="extraDependencyType">
+		<xs:attribute name="bean" type="beanName" use="required" />
+	</xs:complexType>
+
 	<!-- Element definitions -->
 
 	<xs:element name="deployment" type="deploymentType" />
@@ -289,12 +358,15 @@
 	<xs:element name="property" type="propertyType" />
 	<xs:element name="constructor" type="constructorType" />
 	<xs:element name="argument" type="constructorArgumentType" />
-	<xs:element name="item" type="injectableContentType" />
+	<xs:element name="item" type="flatCollectionItemType" />
 	<xs:element name="entry" type="mapEntryType" />
 	<xs:element name="key" type="injectableContentType" />
 	<xs:element name="value" type="injectableContentType" />
 
 	<xs:element name="inject" type="beanInjectionType" />
-	<xs:element name="inject-property" type="propertyInjectionType" />
+	<xs:element name="injectProperty" type="propertyInjectionType" />
+
+	<xs:element name="start" type="lifecycleMethodType" />
+	<xs:element name="dependsOn" type="extraDependencyType" />
 
 </xs:schema>

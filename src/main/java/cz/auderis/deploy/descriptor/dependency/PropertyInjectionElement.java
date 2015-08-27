@@ -24,7 +24,7 @@ import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 
-@XmlRootElement(name = "inject-property")
+@XmlRootElement(name = "injectProperty")
 @XmlType
 public class PropertyInjectionElement extends AbstractInjectionElement {
 	private static final long serialVersionUID = 20150728L;

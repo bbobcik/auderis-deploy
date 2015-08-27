@@ -27,13 +27,13 @@
 	</bean>
 
 	<bean name="simpleBean3" class="cz.auderis.deploy.test.TestBean" >
-		<property name="refProp"> <inject-property bean="simpleBean1" property="textProp" /> </property>
+		<property name="refProp"> <injectProperty bean="simpleBean1" property="textProp" /> </property>
 	</bean>
 
 	<bean name="simpleBean4" class="cz.auderis.deploy.test.TestBean" >
 		<property name="numProp">12345</property>
 		<property name="beanProp"> <inject bean="sub-bean-1" /> </property>
-		<property name="refProp"> <inject-property bean="simpleBean1" property="textProp" /> </property>
+		<property name="refProp"> <injectProperty bean="simpleBean1" property="textProp" /> </property>
 	</bean>
 
 	<bean name="simpleBean5" class="cz.auderis.deploy.test.TestBean" >
@@ -42,7 +42,7 @@
 		</constructor>
 		<property name="numProp">12345</property>
 		<property name="beanProp"> <inject bean="sub-bean-1" /> </property>
-		<property name="refProp"> <inject-property bean="simpleBean1" property="textProp" /> </property>
+		<property name="refProp"> <injectProperty bean="simpleBean1" property="textProp" /> </property>
 	</bean>
 
 	<bean name="simpleBean6" class="cz.auderis.deploy.test.TestBean" >
@@ -53,7 +53,7 @@
 		</constructor>
 		<property name="numProp">12345</property>
 		<property name="beanProp"> <inject bean="sub-bean-1" /> </property>
-		<property name="refProp"> <inject-property bean="simpleBean1" property="textProp" /> </property>
+		<property name="refProp"> <injectProperty bean="simpleBean1" property="textProp" /> </property>
 	</bean>
 
 	<list name="simpleList">

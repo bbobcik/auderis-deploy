@@ -89,7 +89,11 @@ public class BeanInjectionElement extends AbstractInjectionElement {
 
 	@Override
 	public int hashCode() {
-		return 11*super.hashCode() + beanName.hashCode();
+		int hash = super.hashCode();
+		if (null != beanName) {
+			hash = 11*hash + beanName.hashCode();
+		}
+		return hash;
 	}
 
 	@Override

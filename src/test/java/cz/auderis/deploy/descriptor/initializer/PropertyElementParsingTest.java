@@ -25,7 +25,6 @@ import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.xml.sax.SAXException;
 
-import javax.xml.bind.JAXBException;
 import javax.xml.bind.UnmarshalException;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.transform.Source;
@@ -79,7 +78,7 @@ public class PropertyElementParsingTest {
 		// When
 		final PropertyElement property = (PropertyElement) xmlParser.unmarshal(xml);
 		// Then
-		assertThat(property.contents, nullValue());
+		assertThat(property.contents, hasSize(0));
 	}
 
 	@Test
@@ -131,7 +130,7 @@ public class PropertyElementParsingTest {
 	@Category(UnitTest.class)
 	public void shouldParsePropertyInjection() throws Exception {
 		// Given
-		final Source xml = property("<inject-property bean=\"pqr2\" property=\"prop2\" />");
+		final Source xml = property("<injectProperty bean=\"pqr2\" property=\"prop2\" />");
 		// When
 		final PropertyElement property = (PropertyElement) xmlParser.unmarshal(xml);
 		// Then
@@ -169,7 +168,7 @@ public class PropertyElementParsingTest {
 			try {
 				xmlParser.unmarshal(xml);
 				fail("Multiple injections parsed");
-			} catch (JAXBException e) {
+			} catch (UnmarshalException e) {
 				// OK, expected
 			}
 		}

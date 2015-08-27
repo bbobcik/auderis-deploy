@@ -15,25 +15,5 @@
  *
  */
 
-package cz.auderis.deploy.descriptor.bean;
+package cz.auderis.deploy.processor.validator;
 
-public enum BeanType {
-
-	NORMAL,
-
-	LIST,
-
-	SET,
-
-	MAP,
-
-	EXTERNAL_BUNDLE
-
-	;
-
-	public boolean hasIndividualProperties() {
-		return (this == NORMAL) || (this == EXTERNAL_BUNDLE);
-	}
-
-
-}

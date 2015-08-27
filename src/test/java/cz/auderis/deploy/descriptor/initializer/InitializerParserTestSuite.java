@@ -22,8 +22,8 @@ import org.junit.runners.Suite;
 
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
-		PropertyElementParsingTest.class,
 		ConstructorParsingTest.class
+		CollectionItemElementParsingTest.class
 })
 public class InitializerParserTestSuite {
 

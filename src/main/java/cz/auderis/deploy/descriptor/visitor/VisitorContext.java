@@ -31,6 +31,8 @@ public interface VisitorContext {
 
 	Object getHeadContextPart();
 
+	<T> T getTopContextPart(Class<T> partType);
+
 	void pushContextPart(Object ctxPart);
 
 	void popContextPart();

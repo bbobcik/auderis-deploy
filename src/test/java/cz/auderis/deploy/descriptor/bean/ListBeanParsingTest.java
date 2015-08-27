@@ -121,7 +121,7 @@ public class ListBeanParsingTest {
 		final Source xml = listWithItems(
 				"<inject bean=\"klm\" />",
 				"12345",
-				"<inject-property bean=\"pqr\" property=\"prop3\" />"
+				"<injectProperty bean=\"pqr\" property=\"prop3\" />"
 		);
 		// When
 		final StandaloneListBean bean = (StandaloneListBean) xmlParser.unmarshal(xml);

@@ -26,7 +26,6 @@ import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 @XmlRootElement(name = "deployment")
@@ -40,15 +39,22 @@ public class Deployment implements VisitableNode, Serializable {
 	@XmlElementRef(type = DeploymentEntry.class)
 	private List<DeploymentEntry> entries;
 
+	private String id;
+
 	public Deployment() {
 		this.entries = new ArrayList<DeploymentEntry>(8);
 	}
 
 	public List<DeploymentEntry> getEntries() {
-		if (null == entries) {
-			return Collections.emptyList();
-		}
 		return entries;
+	}
+
+	public String getId() {
+		return id;
+	}
+
+	public void setId(String id) {
+		this.id = id;
 	}
 
 	@Override

@@ -44,11 +44,16 @@ public final class XmlSupport {
 		return filteredSource;
 	}
 
+
 	public static Source xml(Class<?> baseClass, String resourceName) throws SAXException {
 		final InputStream resourceStream = baseClass.getResourceAsStream(resourceName);
 		final InputSource baseSource = new InputSource(resourceStream);
 		final Source filteredSource = DescriptorParserSupport.filterSourceNamespace(baseSource);
 		return filteredSource;
+	}
+
+	public static String cdata(String text) {
+		return "<![CDATA[" + text + "]]>";
 	}
 
 	public static Unmarshaller createValidatingParser() throws JAXBException {

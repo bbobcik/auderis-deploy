@@ -18,6 +18,7 @@
 package cz.auderis.deploy.descriptor.visitor;
 
 import cz.auderis.deploy.descriptor.dependency.BeanInjectionElement;
+import cz.auderis.deploy.descriptor.dependency.ExtraDependency;
 import cz.auderis.deploy.descriptor.dependency.PropertyInjectionElement;
 import cz.auderis.deploy.descriptor.initializer.CollectionItemElement;
 import cz.auderis.deploy.descriptor.initializer.ConstructorArgumentElement;
@@ -46,6 +47,8 @@ public interface DeploymentStructureVisitor extends DeploymentVisitor {
 	void visitBeanInjection(BeanInjectionElement beanInjection);
 
 	void visitPropertyInjection(PropertyInjectionElement propertyInjection);
+
+	void visitExtraDependency(ExtraDependency extraDependency);
 
 	void visitStringValue(String item);
 
