@@ -31,7 +31,7 @@ public enum BeanConflictMode implements DescriptorParserSupport.NamedEnum {
 
 	REPLACE("Replace", "KeepLast", "Keep last", "keep-last"),
 
-	UPDATE("Update", "Override", "Incremental"),
+	UPDATE("Update", "Override", "Incremental", "Merge"),
 
 	;
 

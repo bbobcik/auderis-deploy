@@ -17,11 +17,20 @@
 
 package cz.auderis.deploy.descriptor.bean;
 
+import javax.xml.bind.annotation.XmlAttribute;
+
 public abstract class StandaloneCollectionBean extends AbstractBean {
 	private static final long serialVersionUID = 20150728L;
 
+	@XmlAttribute(name = "mutable", required = false)
+	protected boolean mutable;
+
 	protected StandaloneCollectionBean(BeanType beanType) {
 		super(beanType);
+	}
+
+	public boolean isMutable() {
+		return mutable;
 	}
 
 }

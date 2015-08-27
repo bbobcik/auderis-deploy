@@ -64,6 +64,8 @@
 		<xs:annotation>
 			<xs:documentation>
 				Defines behaviour of the deployer when it processes a bean with already defined name.
+				Notice that non-failure conflict resolution modes are sensitive to the order in which
+				the beans are encountered during parsing.
 			</xs:documentation>
 		</xs:annotation>
 		<xs:restriction base="xs:string">
@@ -109,7 +111,7 @@
 					<xs:documentation>
 						Existing bean definition will be updated by setting properties to values specified in subsequent
 						definitions.
-						(Aliases: Override, Incremental)
+						(Aliases: Override, Incremental, Merge)
 					</xs:documentation>
 				</xs:annotation>
 			</xs:enumeration>
@@ -261,6 +263,7 @@
 					<xs:element ref="item" />
 				</xs:sequence>
 				<xs:attribute name="itemClass" type="javaQualifiedClassName" use="optional" />
+				<xs:attribute name="mutable" type="xs:boolean" use="optional" default="false" />
 			</xs:extension>
 		</xs:complexContent>
 	</xs:complexType>
@@ -273,6 +276,7 @@
 				</xs:sequence>
 				<xs:attribute name="keyClass" type="javaQualifiedClassName" use="optional" />
 				<xs:attribute name="valueClass" type="javaQualifiedClassName" use="optional" />
+				<xs:attribute name="mutable" type="xs:boolean" use="optional" default="false" />
 			</xs:extension>
 		</xs:complexContent>
 	</xs:complexType>
