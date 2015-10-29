@@ -19,10 +19,13 @@ package cz.auderis.deploy.descriptor.bean;
 
 import cz.auderis.deploy.descriptor.dependency.BeanInjectionElement;
 import cz.auderis.deploy.descriptor.dependency.PropertyInjectionElement;
+import cz.auderis.test.category.SanityTest;
 import cz.auderis.test.category.UnitTest;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
+import org.junit.rules.ExpectedException;
 import org.xml.sax.SAXException;
 
 import javax.xml.bind.UnmarshalException;
@@ -36,9 +39,11 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
-import static org.junit.Assert.fail;
 
 public class ListBeanParsingTest {
+
+	@Rule
+	public ExpectedException expectedException = ExpectedException.none();
 
 	private static final String BEAN_START = "<list name=\"x\">";
 	private static final String BEAN_END = "</list>";
@@ -51,15 +56,14 @@ public class ListBeanParsingTest {
 	}
 
 	@Test
-	@Category(UnitTest.class)
+	@Category({ UnitTest.class, SanityTest.class })
 	public void shouldRequireNameAttribute() throws Exception {
-		try {
-			final Source xml = xml("<list></list>");
-			xmlParser.unmarshal(xml);
-			fail("List bean without name attribute was parsed");
-		} catch (UnmarshalException e) {
-			// OK, expected
-		}
+		// Given
+		final Source xml = xml("<list></list>");
+		expectedException.expect(UnmarshalException.class);
+		expectedException.reportMissingExceptionWithMessage("List bean without name attribute was parsed");
+		// When / Then
+		xmlParser.unmarshal(xml);
 	}
 
 	@Test

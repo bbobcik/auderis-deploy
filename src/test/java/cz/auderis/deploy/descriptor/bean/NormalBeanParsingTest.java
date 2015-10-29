@@ -19,10 +19,13 @@ package cz.auderis.deploy.descriptor.bean;
 
 import cz.auderis.deploy.descriptor.initializer.ConstructorElement;
 import cz.auderis.deploy.descriptor.initializer.PropertyElement;
+import cz.auderis.test.category.SanityTest;
 import cz.auderis.test.category.UnitTest;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
+import org.junit.rules.ExpectedException;
 import org.xml.sax.SAXException;
 
 import javax.xml.bind.UnmarshalException;
@@ -37,9 +40,11 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.Assert.assertThat;
-import static org.junit.Assert.fail;
 
 public class NormalBeanParsingTest {
+
+	@Rule
+	public ExpectedException expectedException = ExpectedException.none();
 
 	private static final String BEAN_START = "<bean name=\"xyz\" class=\"java.lang.Object\">";
 	private static final String BEAN_END = "</bean>";
@@ -52,27 +57,25 @@ public class NormalBeanParsingTest {
 	}
 
 	@Test
-	@Category(UnitTest.class)
+	@Category({ UnitTest.class, SanityTest.class })
 	public void shouldRequireNameAttribute() throws Exception {
-		try {
-			final Source xml = xml("<bean class=\"java.lang.Object\" ></bean>");
-			xmlParser.unmarshal(xml);
-			fail("Normal bean without name attribute was parsed");
-		} catch (UnmarshalException e) {
-			// OK, expected
-		}
+		// Given
+		final Source xml = xml("<bean class=\"java.lang.Object\" ></bean>");
+		expectedException.expect(UnmarshalException.class);
+		expectedException.reportMissingExceptionWithMessage("Normal bean without name attribute was parsed");
+		// When / Then
+		xmlParser.unmarshal(xml);
 	}
 
 	@Test
-	@Category(UnitTest.class)
+	@Category({ UnitTest.class, SanityTest.class })
 	public void shouldRequireClassAttribute() throws Exception {
-		try {
-			final Source xml = xml("<bean name=\"x\"></bean>");
-			xmlParser.unmarshal(xml);
-			fail("Normal bean without class attribute was parsed");
-		} catch (UnmarshalException e) {
-			// OK, expected
-		}
+		// Given
+		final Source xml = xml("<bean name=\"x\"></bean>");
+		expectedException.expect(UnmarshalException.class);
+		expectedException.reportMissingExceptionWithMessage("Normal bean without class attribute was parsed");
+		// When / Then
+		xmlParser.unmarshal(xml);
 	}
 
 	@Test

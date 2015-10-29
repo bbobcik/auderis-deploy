@@ -19,10 +19,16 @@ package cz.auderis.deploy.descriptor.initializer;
 
 import cz.auderis.deploy.descriptor.dependency.BeanInjectionElement;
 import cz.auderis.deploy.descriptor.dependency.PropertyInjectionElement;
+import cz.auderis.test.category.SanityTest;
 import cz.auderis.test.category.UnitTest;
+import junitparams.JUnitParamsRunner;
+import junitparams.Parameters;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
+import org.junit.rules.ExpectedException;
+import org.junit.runner.RunWith;
 import org.xml.sax.SAXException;
 
 import javax.xml.bind.UnmarshalException;
@@ -36,9 +42,12 @@ import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertThat;
-import static org.junit.Assert.fail;
 
+@RunWith(JUnitParamsRunner.class)
 public class PropertyElementParsingTest {
+
+	@Rule
+	public ExpectedException expectedException = ExpectedException.none();
 
 	private Unmarshaller xmlParser;
 
@@ -48,15 +57,14 @@ public class PropertyElementParsingTest {
 	}
 
 	@Test
-	@Category(UnitTest.class)
+	@Category({ UnitTest.class, SanityTest.class })
 	public void shouldRequireNameAttribute() throws Exception {
-		try {
-			final Source xml = xml("<property />");
-			xmlParser.unmarshal(xml);
-			fail("Property without name attribute was parsed");
-		} catch (UnmarshalException e) {
-			// OK, expected
-		}
+		// Given
+		final Source xml = xml("<property />");
+		expectedException.expect(UnmarshalException.class);
+		expectedException.reportMissingExceptionWithMessage("Property without name attribute was parsed");
+		// When / Then
+		xmlParser.unmarshal(xml);
 	}
 
 	@Test
@@ -156,22 +164,19 @@ public class PropertyElementParsingTest {
 	}
 
 	@Test
-	@Category(UnitTest.class)
-	public void shouldNotAllowMultipleInjections() throws Exception {
-		final String[] illegalXmls =  {
-				"<inject bean=\"a\" /><inject bean=\"b\" />",
-				"<inject bean=\"a\" /><inject-property bean=\"b\" property=\"prop\" />",
-				"<inject-property bean=\"a\" property=\"x\" /><inject-property bean=\"b\" property=\"prop\" />"
-		};
-		for (final String illegalXml : illegalXmls) {
-			final Source xml = property(illegalXml);
-			try {
-				xmlParser.unmarshal(xml);
-				fail("Multiple injections parsed");
-			} catch (UnmarshalException e) {
-				// OK, expected
-			}
-		}
+	@Category({ UnitTest.class, SanityTest.class })
+	@Parameters({
+			"<inject bean=\"a\" /><inject bean=\"b\" />",
+			"<inject bean=\"a\" /><inject-property bean=\"b\" property=\"prop\" />",
+			"<inject-property bean=\"a\" property=\"x\" /><inject-property bean=\"b\" property=\"prop\" />"
+	})
+	public void shouldNotAllowMultipleInjections(String propertyContents) throws Exception {
+		// Given
+		expectedException.expect(UnmarshalException.class);
+		expectedException.reportMissingExceptionWithMessage("Multiple injections parsed");
+		final Source xml = property(propertyContents);
+		// When / Then
+		xmlParser.unmarshal(xml);
 	}
 
 

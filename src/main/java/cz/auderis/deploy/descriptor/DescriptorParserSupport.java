@@ -46,8 +46,10 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 public final class DescriptorParserSupport {
@@ -173,6 +175,31 @@ public final class DescriptorParserSupport {
 			}
 		}
 		return null;
+	}
+
+	public static <T extends Enum<T> & NamedEnum> Map<String, T> namedEnumAliasMap(Class<T> enumClass, boolean includeCanonical) {
+		final T[] enumConstants = enumClass.getEnumConstants();
+		final Map<String, T> aliases = new HashMap<String, T>(enumConstants.length);
+		for (final T enumConstant : enumConstants) {
+			for (final String name : enumConstant.getRecognizedNames()) {
+				if (includeCanonical || !name.equals(enumConstant.getCanonicalName())) {
+					aliases.put(name, enumConstant);
+				}
+			}
+		}
+		return aliases;
+	}
+
+	public static <T extends Enum<T> & NamedEnum> Object[] namedEnumAliases(Class<T> enumClass, boolean includeCanonical) {
+		final Map<String, T> aliasMap = namedEnumAliasMap(enumClass, includeCanonical);
+		final Object[] result = new Object[aliasMap.size()];
+		int resultIdx = 0;
+		for (final Map.Entry<String, T> entry : aliasMap.entrySet()) {
+			final Object[] item = new Object[] { entry.getKey(), entry.getValue() };
+			result[resultIdx] = item;
+			++resultIdx;
+		}
+		return result;
 	}
 
 	@SuppressWarnings("unchecked")
