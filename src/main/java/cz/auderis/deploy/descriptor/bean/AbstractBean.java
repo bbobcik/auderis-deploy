@@ -23,7 +23,6 @@ import cz.auderis.deploy.descriptor.dependency.DependencyInstance;
 
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlID;
-import javax.xml.bind.annotation.XmlTransient;
 import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.Set;
@@ -39,25 +38,21 @@ public abstract class AbstractBean extends DeploymentEntry {
 	@XmlAttribute(name = "name", required = true)
 	protected String name;
 
-	@XmlTransient
-	protected BeanInstantiationMode instantiationMode;
-
-	@XmlTransient
-	protected BeanConflictMode conflictResolutionMode;
-
-	@XmlTransient
 	protected final BeanType beanType;
-
 	protected final Set<DependencyInstance> dependencies;
+	protected BeanInstantiationMode instantiationMode;
+	protected BeanConflictMode conflictResolutionMode;
+	protected BeanLifecycleStage lifecycleStage;
 
 	protected AbstractBean(BeanType type) {
 		if (null == type) {
 			throw new NullPointerException();
 		}
 		this.beanType = type;
+		this.dependencies = new LinkedHashSet<DependencyInstance>(2);
 		this.instantiationMode = BeanInstantiationMode.getDefaultMode();
 		this.conflictResolutionMode = BeanConflictMode.getDefaultMode();
-		this.dependencies = new LinkedHashSet<DependencyInstance>(2);
+		this.lifecycleStage = BeanLifecycleStage.NOT_INITIALIZED;
 	}
 
 	protected AbstractBean(String name, BeanType type, BeanInstantiationMode instMode, BeanConflictMode conflictMode) {
@@ -107,6 +102,35 @@ public abstract class AbstractBean extends DeploymentEntry {
 
 	public void removeDependency(DependencyInstance dep) {
 		dependencies.remove(dep);
+	}
+
+	public BeanLifecycleStage getLifecycleStage() {
+		return lifecycleStage;
+	}
+
+	public void setLifecycleStage(BeanLifecycleStage newStatus) {
+		if (null == newStatus) {
+			throw new NullPointerException();
+		}
+		this.lifecycleStage = newStatus;
+	}
+
+	public void setConditionalLifecycleStage(BeanLifecycleStage newStage) {
+		if (null == newStage) {
+			throw new NullPointerException();
+		}
+		if (!this.lifecycleStage.isTerminalState()) {
+			this.lifecycleStage = newStage;
+		}
+	}
+
+	public void updateDefinition(AbstractBean updatingBean) {
+		if (null == updatingBean) {
+			throw new NullPointerException();
+		}
+		this.instantiationMode = updatingBean.getInstantiationMode();
+		this.conflictResolutionMode = updatingBean.getConflictResolutionMode();
+		this.dependencies.addAll(updatingBean.getDependencies());
 	}
 
 	@XmlAttribute(name = "mode")
@@ -166,6 +190,12 @@ public abstract class AbstractBean extends DeploymentEntry {
 			return false;
 		}
 		return true;
+	}
+
+	protected void appendCommonBeanInfo(StringBuilder str) {
+		str.append("type=").append(beanType);
+		str.append(", mode=").append(instantiationMode);
+		str.append(", stage=").append(lifecycleStage);
 	}
 
 }

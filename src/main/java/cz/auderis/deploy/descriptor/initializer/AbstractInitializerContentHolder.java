@@ -19,6 +19,8 @@ package cz.auderis.deploy.descriptor.initializer;
 
 import cz.auderis.deploy.descriptor.dependency.BeanInjectionElement;
 import cz.auderis.deploy.descriptor.dependency.PropertyInjectionElement;
+import cz.auderis.deploy.descriptor.dependency.ResolutionStatus;
+import cz.auderis.deploy.descriptor.dependency.ResolvableElement;
 import cz.auderis.deploy.descriptor.visitor.DeploymentStructureVisitor;
 import cz.auderis.deploy.descriptor.visitor.VisitableStructuralNode;
 import cz.auderis.deploy.descriptor.visitor.VisitorContext;
@@ -34,7 +36,7 @@ import java.util.List;
 import static cz.auderis.deploy.descriptor.initializer.InitializerContentType.TEXT;
 import static cz.auderis.deploy.descriptor.initializer.InitializerContentType.determineTypeFromMixedContents;
 
-public abstract class AbstractInitializerContentHolder implements Serializable {
+public abstract class AbstractInitializerContentHolder implements Serializable, ResolvableElement {
 	private static final long serialVersionUID = 20150728L;
 
 	@XmlMixed
@@ -45,16 +47,19 @@ public abstract class AbstractInitializerContentHolder implements Serializable {
 	protected List<Object> contents;
 
 	private InitializerContentType contentType;
+	private boolean normalized;
 
 	protected AbstractInitializerContentHolder() {
 		contents = new ArrayList<Object>(1);
 	}
 
 	public List<Object> getContents() {
+		normalizeContents();
 		return contents;
 	}
 
 	public InitializerContentType getContentType() {
+		normalizeContents();
 		assert null != contentType : "Content type was not yet determined";
 		return contentType;
 	}
@@ -66,10 +71,39 @@ public abstract class AbstractInitializerContentHolder implements Serializable {
 		this.contentType = contentType;
 	}
 
+	@Override
+	public ResolutionStatus getResolutionStatus() {
+		normalizeContents();
+		ResolutionStatus status = ResolutionStatus.RESOLVED;
+		for (final Object part : contents) {
+			if (part instanceof ResolvableElement) {
+				final ResolvableElement element = (ResolvableElement) part;
+				if (!element.getResolutionStatus().isResolved()) {
+					status = ResolutionStatus.UNRESOLVED;
+					break;
+				}
+			}
+		}
+		return status;
+	}
+
+	@Override
+	public void setResolutionStatus(ResolutionStatus newStatus) {
+		throw new AssertionError("cannot change status of compound resolvable element");
+	}
+
+	@Override
+	public boolean isCompoundElement() {
+		return true;
+	}
+
 	public void normalizeContents() {
-		if (null == contents) {
+		if (normalized) {
+			return;
+		} else if (null == contents) {
 			contents = Collections.emptyList();
 			contentType = TEXT;
+			normalized = true;
 			return;
 		}
 		if (null == contentType) {
@@ -104,6 +138,7 @@ public abstract class AbstractInitializerContentHolder implements Serializable {
 			default:
 				throw new AssertionError();
 		}
+		normalized = true;
 	}
 
 	protected void acceptVisitorForContents(DeploymentStructureVisitor visitor, VisitorContext context) {

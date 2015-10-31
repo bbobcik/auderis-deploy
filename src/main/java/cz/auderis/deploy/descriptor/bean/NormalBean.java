@@ -29,7 +29,10 @@ import javax.xml.bind.annotation.XmlElementRef;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.ListIterator;
+import java.util.Map;
 
 @XmlRootElement(name = "bean")
 @XmlType
@@ -66,6 +69,42 @@ public class NormalBean extends AbstractBean {
 
 	public List<PropertyElement> getProperties() {
 		return properties;
+	}
+
+	@Override
+	public void updateDefinition(AbstractBean updatingAbstractBean) {
+		super.updateDefinition(updatingAbstractBean);
+		//
+		assert updatingAbstractBean instanceof NormalBean;
+		final NormalBean updatingBean = (NormalBean) updatingAbstractBean;
+		// Replace bean class
+		this.beanClass = updatingBean.getBeanClassName();
+		// Replace constructor element if defined
+		final ConstructorElement newConstructor = updatingBean.getConstructor();
+		if (null != newConstructor) {
+			this.constructor = newConstructor;
+		}
+		// Update list of properties
+		final List<PropertyElement> updatingProperties = updatingBean.getProperties();
+		final Map<String, PropertyElement> updateMap = new HashMap<String, PropertyElement>(updatingProperties.size());
+		for (final PropertyElement property : updatingProperties) {
+			updateMap.put(property.getName(), property);
+		}
+		final ListIterator<PropertyElement> propertyIterator = properties.listIterator();
+		while (propertyIterator.hasNext()) {
+			final PropertyElement property = propertyIterator.next();
+			final String name = property.getName();
+			final PropertyElement update = updateMap.get(name);
+			if (null != update) {
+				propertyIterator.remove();
+				propertyIterator.add(update);
+				updateMap.remove(name);
+			}
+		}
+		properties.addAll(updateMap.values());
+		// Replace dependencies
+		this.dependencies.clear();
+		this.dependencies.addAll(updatingBean.getDependencies());
 	}
 
 	@Override
@@ -112,6 +151,17 @@ public class NormalBean extends AbstractBean {
 			return false;
 		}
 		return true;
+	}
+
+	@Override
+	public String toString() {
+		final StringBuilder str = new StringBuilder(64);
+		str.append(name);
+		str.append("{cls=").append(beanClass);
+		str.append(", ");
+		appendCommonBeanInfo(str);
+		str.append('}');
+		return str.toString();
 	}
 
 }

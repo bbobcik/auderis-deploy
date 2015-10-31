@@ -15,22 +15,11 @@
  *
  */
 
-package cz.auderis.deploy.descriptor.bean;
+package cz.auderis.deploy;
 
-import org.junit.runner.RunWith;
-import org.junit.runners.Suite;
+public interface LogName {
 
-@RunWith(Suite.class)
-@Suite.SuiteClasses({
-		BasicBeanParsingTest.class,
-		BeanAttributeParsingTest.class,
-		NormalBeanParsingTest.class,
-		ListBeanParsingTest.class,
-		SetBeanParsingTest.class,
-		MapBeanParsingTest.class
-})
-public class BeanParserTestSuite {
-
-	// No content, suite definition only
+	String BASE = "cz.auderis.deploy";
+	String PARSER = BASE + ".parser";
 
 }

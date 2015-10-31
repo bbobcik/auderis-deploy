@@ -70,6 +70,17 @@ public class ExternalBundleBean extends AbstractBean {
 	}
 
 	@Override
+	public void updateDefinition(AbstractBean updatingAbstractBean) {
+		super.updateDefinition(updatingAbstractBean);
+		//
+		assert updatingAbstractBean instanceof ExternalBundleBean;
+		final ExternalBundleBean updatingBean = (ExternalBundleBean) updatingAbstractBean;
+		// Replace source mode
+		this.sourceMode = updatingBean.getSourceMode();
+
+	}
+
+	@Override
 	public void accept(DeploymentVisitor visitor, VisitorContext context) {
 		context.pushContextPart(this);
 		try {

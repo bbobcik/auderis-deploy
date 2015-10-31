@@ -15,22 +15,19 @@
  *
  */
 
-package cz.auderis.deploy.descriptor.bean;
+package cz.auderis.deploy.parser;
 
-import org.junit.runner.RunWith;
-import org.junit.runners.Suite;
+import cz.auderis.deploy.DeployerException;
 
-@RunWith(Suite.class)
-@Suite.SuiteClasses({
-		BasicBeanParsingTest.class,
-		BeanAttributeParsingTest.class,
-		NormalBeanParsingTest.class,
-		ListBeanParsingTest.class,
-		SetBeanParsingTest.class,
-		MapBeanParsingTest.class
-})
-public class BeanParserTestSuite {
+public class BeanDefinitionException extends DeployerException {
+	private static final long serialVersionUID = 20151031L;
 
-	// No content, suite definition only
+	public BeanDefinitionException() {
+		super();
+	}
+
+	public BeanDefinitionException(String message) {
+		super(message);
+	}
 
 }

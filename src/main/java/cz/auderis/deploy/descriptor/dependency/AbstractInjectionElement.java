@@ -21,18 +21,38 @@ import cz.auderis.deploy.descriptor.visitor.VisitableStructuralNode;
 
 import java.io.Serializable;
 
-public abstract class AbstractInjectionElement implements VisitableStructuralNode, Serializable {
+public abstract class AbstractInjectionElement implements VisitableStructuralNode, ResolvableElement, Serializable {
 	private static final long serialVersionUID = 20150728L;
 
 	protected final InjectionType type;
+	protected ResolutionStatus resolutionStatus;
 
 	protected AbstractInjectionElement(InjectionType type) {
 		assert null != type;
 		this.type = type;
+		this.resolutionStatus = ResolutionStatus.UNRESOLVED;
 	}
 
 	public InjectionType getType() {
 		return type;
+	}
+
+	@Override
+	public ResolutionStatus getResolutionStatus() {
+		return resolutionStatus;
+	}
+
+	@Override
+	public void setResolutionStatus(ResolutionStatus newStatus) {
+		if (null == newStatus) {
+			throw new NullPointerException();
+		}
+		this.resolutionStatus = newStatus;
+	}
+
+	@Override
+	public boolean isCompoundElement() {
+		return false;
 	}
 
 	@Override

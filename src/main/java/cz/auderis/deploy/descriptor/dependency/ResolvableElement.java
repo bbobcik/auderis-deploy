@@ -15,22 +15,14 @@
  *
  */
 
-package cz.auderis.deploy.descriptor.bean;
+package cz.auderis.deploy.descriptor.dependency;
 
-import org.junit.runner.RunWith;
-import org.junit.runners.Suite;
+public interface ResolvableElement {
 
-@RunWith(Suite.class)
-@Suite.SuiteClasses({
-		BasicBeanParsingTest.class,
-		BeanAttributeParsingTest.class,
-		NormalBeanParsingTest.class,
-		ListBeanParsingTest.class,
-		SetBeanParsingTest.class,
-		MapBeanParsingTest.class
-})
-public class BeanParserTestSuite {
+	ResolutionStatus getResolutionStatus();
 
-	// No content, suite definition only
+	void setResolutionStatus(ResolutionStatus newStatus);
+
+	boolean isCompoundElement();
 
 }

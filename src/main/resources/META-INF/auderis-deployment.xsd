@@ -282,6 +282,9 @@
 	<xs:complexType name="externalResourceType">
 		<xs:complexContent>
 			<xs:extension base="beanType">
+				<xs:sequence minOccurs="0" maxOccurs="unbounded">
+					<xs:element ref="resource" />
+				</xs:sequence>
 				<xs:attribute name="useResource" type="bundleSourceMode" use="optional" />
 			</xs:extension>
 		</xs:complexContent>
@@ -319,6 +322,13 @@
 				<xs:attribute name="name" type="javaUnqualifiedIdentifier" use="required" />
 			</xs:extension>
 		</xs:complexContent>
+	</xs:complexType>
+
+	<xs:complexType name="resourceSpecificationType" mixed="false">
+		<xs:simpleContent>
+			<xs:extension base="xs:string">
+			</xs:extension>
+		</xs:simpleContent>
 	</xs:complexType>
 
 	<xs:complexType name="mapEntryType">
@@ -364,6 +374,7 @@
 	<xs:element name="entry" type="mapEntryType" />
 	<xs:element name="key" type="injectableContentType" />
 	<xs:element name="value" type="injectableContentType" />
+	<xs:element name="resource" type="resourceSpecificationType" />
 
 	<xs:element name="inject" type="beanInjectionType" />
 	<xs:element name="injectProperty" type="propertyInjectionType" />

@@ -60,6 +60,22 @@ public class StandaloneListBean extends StandaloneCollectionBean {
 	}
 
 	@Override
+	public void updateDefinition(AbstractBean updatingAbstractBean) {
+		super.updateDefinition(updatingAbstractBean);
+		//
+		assert updatingAbstractBean instanceof StandaloneListBean;
+		final StandaloneListBean updatingBean = (StandaloneListBean) updatingAbstractBean;
+		// Replace item class
+		final String updatingItemClass = updatingBean.getItemClassName();
+		if ((null != updatingItemClass) && !updatingItemClass.trim().isEmpty()) {
+			this.itemClass = updatingItemClass;
+		}
+		// Replace list items
+		this.items.clear();
+		this.items.addAll(updatingBean.getItems());
+	}
+
+	@Override
 	public void accept(DeploymentVisitor visitor, VisitorContext context) {
 		context.pushContextPart(this);
 		try {

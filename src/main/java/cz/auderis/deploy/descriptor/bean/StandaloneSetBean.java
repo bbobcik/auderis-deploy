@@ -61,6 +61,22 @@ public class StandaloneSetBean extends StandaloneCollectionBean {
 	}
 
 	@Override
+	public void updateDefinition(AbstractBean updatingAbstractBean) {
+		super.updateDefinition(updatingAbstractBean);
+		//
+		assert updatingAbstractBean instanceof StandaloneSetBean;
+		final StandaloneSetBean updatingBean = (StandaloneSetBean) updatingAbstractBean;
+		// Replace item class
+		final String updatingItemClass = updatingBean.getItemClassName();
+		if ((null != updatingItemClass) && !updatingItemClass.trim().isEmpty()) {
+			this.itemClass = updatingItemClass;
+		}
+		// Replace set items
+		this.items.clear();
+		this.items.addAll(updatingBean.getItems());
+	}
+
+	@Override
 	public void accept(DeploymentVisitor visitor, VisitorContext context) {
 		context.pushContextPart(this);
 		try {

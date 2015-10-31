@@ -29,14 +29,38 @@ import java.io.Serializable;
 
 @XmlRootElement(name = "dependsOn")
 @XmlType(name = "extraDependencyType")
-public class ExtraDependency implements VisitableStructuralNode, Serializable{
+public class ExtraDependency implements VisitableStructuralNode, ResolvableElement, Serializable{
 	private static final long serialVersionUID = 20150821L;
 
 	@XmlAttribute(name = "bean", required = true)
 	protected String beanName;
 
+	protected ResolutionStatus resolutionStatus;
+
+	public ExtraDependency() {
+		this.resolutionStatus = ResolutionStatus.UNRESOLVED;
+	}
+
 	public String getBeanName() {
 		return beanName;
+	}
+
+	@Override
+	public ResolutionStatus getResolutionStatus() {
+		return resolutionStatus;
+	}
+
+	@Override
+	public void setResolutionStatus(ResolutionStatus newStatus) {
+		if (null == newStatus) {
+			throw new NullPointerException();
+		}
+		this.resolutionStatus = newStatus;
+	}
+
+	@Override
+	public boolean isCompoundElement() {
+		return false;
 	}
 
 	@Override
@@ -48,4 +72,5 @@ public class ExtraDependency implements VisitableStructuralNode, Serializable{
 			context.popContextPart();
 		}
 	}
+
 }

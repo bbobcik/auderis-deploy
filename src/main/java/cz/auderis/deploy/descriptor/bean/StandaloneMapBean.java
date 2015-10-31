@@ -64,6 +64,30 @@ public class StandaloneMapBean extends StandaloneCollectionBean {
 		return valueClassName;
 	}
 
+	public List<MapEntryElement> getEntries() {
+		return entries;
+	}
+
+	@Override
+	public void updateDefinition(AbstractBean updatingAbstractBean) {
+		super.updateDefinition(updatingAbstractBean);
+		//
+		assert updatingAbstractBean instanceof StandaloneMapBean;
+		final StandaloneMapBean updatingBean = (StandaloneMapBean) updatingAbstractBean;
+		// Replace key and value class as needed
+		final String updatingKeyClass = updatingBean.getKeyClassName();
+		if ((null != updatingKeyClass) && !updatingKeyClass.trim().isEmpty()) {
+			this.keyClassName = updatingKeyClass;
+		}
+		final String updatingValueClass = updatingBean.getValueClassName();
+		if ((null != updatingValueClass) && !updatingValueClass.trim().isEmpty()) {
+			this.valueClassName = updatingValueClass;
+		}
+		// Replace map entries
+		this.entries.clear();
+		this.entries.addAll(updatingBean.getEntries());
+	}
+
 	@Override
 	public void accept(DeploymentVisitor visitor, VisitorContext context) {
 		context.pushContextPart(this);

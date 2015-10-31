@@ -32,13 +32,18 @@ import cz.auderis.deploy.descriptor.visitor.DeploymentStructureVisitorAdapter;
 import cz.auderis.deploy.descriptor.visitor.VisitorContext;
 
 import java.text.MessageFormat;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.ResourceBundle;
 import java.util.regex.Matcher;
 
 class SyntaxCheckVisitor extends DeploymentStructureVisitorAdapter {
 
+	public static final String DEFAULT_RESOURCE_BUNDLE = "cz.auderis.deploy.processor.validator.Validator";
+
 	private final VisitorContext context;
 	private final ResourceBundle validationBundle;
+	private final List<SyntaxCheckMessage> messages;
 
 	SyntaxCheckVisitor(VisitorContext context) {
 		this(context, null);
@@ -47,11 +52,16 @@ class SyntaxCheckVisitor extends DeploymentStructureVisitorAdapter {
 	SyntaxCheckVisitor(VisitorContext context, ResourceBundle bundle) {
 		assert null != context;
 		this.context = context;
+		this.messages = new LinkedList<SyntaxCheckMessage>();
 		if (null != bundle) {
 			this.validationBundle = bundle;
 		} else {
-			this.validationBundle = ResourceBundle.getBundle("cz.auderis.deploy.processor.validator.Validator");
+			this.validationBundle = ResourceBundle.getBundle(DEFAULT_RESOURCE_BUNDLE);
 		}
+	}
+
+	public List<SyntaxCheckMessage> getMessages() {
+		return messages;
 	}
 
 	@Override
@@ -137,6 +147,8 @@ class SyntaxCheckVisitor extends DeploymentStructureVisitorAdapter {
 		final AbstractBean currentBean = context.getCurrentBean();
 		final String parentBeanName = currentBean.getName();
 		final String msg = formatMessage(msgId, beanName, parentBeanName);
+		final SyntaxCheckMessage msgInstance = new SyntaxCheckMessage(msg);
+		messages.add(msgInstance);
 	}
 
 	private void checkPropertyName(String propertyName, String msgId) {
@@ -151,6 +163,8 @@ class SyntaxCheckVisitor extends DeploymentStructureVisitorAdapter {
 		final AbstractBean currentBean = context.getCurrentBean();
 		final String beanName = currentBean.getName();
 		final String msg = formatMessage(msgId, propertyName, beanName);
+		final SyntaxCheckMessage msgInstance = new SyntaxCheckMessage(msg);
+		messages.add(msgInstance);
 	}
 
 	private void checkClassName(String className, String msgId) {
@@ -165,6 +179,8 @@ class SyntaxCheckVisitor extends DeploymentStructureVisitorAdapter {
 		final AbstractBean currentBean = context.getCurrentBean();
 		final String beanName = currentBean.getName();
 		final String msg = formatMessage(msgId, className, beanName);
+		final SyntaxCheckMessage msgInstance = new SyntaxCheckMessage(msg);
+		messages.add(msgInstance);
 	}
 
 	private void checkOptionalClassName(String className, String msgId) {

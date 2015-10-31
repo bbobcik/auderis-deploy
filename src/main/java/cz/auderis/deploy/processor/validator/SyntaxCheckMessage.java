@@ -15,22 +15,24 @@
  *
  */
 
-package cz.auderis.deploy.descriptor.bean;
+package cz.auderis.deploy.processor.validator;
 
-import org.junit.runner.RunWith;
-import org.junit.runners.Suite;
+import java.io.Serializable;
 
-@RunWith(Suite.class)
-@Suite.SuiteClasses({
-		BasicBeanParsingTest.class,
-		BeanAttributeParsingTest.class,
-		NormalBeanParsingTest.class,
-		ListBeanParsingTest.class,
-		SetBeanParsingTest.class,
-		MapBeanParsingTest.class
-})
-public class BeanParserTestSuite {
+public class SyntaxCheckMessage implements Serializable {
+	private static final long serialVersionUID = 20151030L;
 
-	// No content, suite definition only
+	private final String message;
+
+	public SyntaxCheckMessage(String message) {
+		if (null == message) {
+			throw new NullPointerException();
+		}
+		this.message = message;
+	}
+
+	public String getMessage() {
+		return message;
+	}
 
 }
