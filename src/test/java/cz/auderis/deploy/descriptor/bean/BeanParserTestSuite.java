@@ -27,7 +27,8 @@ import org.junit.runners.Suite;
 		NormalBeanParsingTest.class,
 		ListBeanParsingTest.class,
 		SetBeanParsingTest.class,
-		MapBeanParsingTest.class
+		MapBeanParsingTest.class,
+		ExternalBundleBeanParsingTest.class
 })
 public class BeanParserTestSuite {
 

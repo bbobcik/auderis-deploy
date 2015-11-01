@@ -23,6 +23,7 @@ import cz.auderis.deploy.descriptor.dependency.PropertyInjectionElement;
 import cz.auderis.deploy.descriptor.initializer.CollectionItemElement;
 import cz.auderis.deploy.descriptor.initializer.ConstructorArgumentElement;
 import cz.auderis.deploy.descriptor.initializer.ConstructorElement;
+import cz.auderis.deploy.descriptor.initializer.ExternalResourceElement;
 import cz.auderis.deploy.descriptor.initializer.MapEntryElement;
 import cz.auderis.deploy.descriptor.initializer.MapKeyElement;
 import cz.auderis.deploy.descriptor.initializer.MapValueElement;
@@ -43,6 +44,8 @@ public interface DeploymentStructureVisitor extends DeploymentVisitor {
 	void visitMapKey(MapKeyElement mapKey);
 
 	void visitMapValue(MapValueElement mapValue);
+
+	void visitResourceSpecification(ExternalResourceElement resource);
 
 	void visitBeanInjection(BeanInjectionElement beanInjection);
 

@@ -2,6 +2,7 @@ AbstractInitializerContentHolder
 CollectionItemElement
 ConstructorArgumentElement
 ConstructorElement
+ExternalResourceElement
 MapEntryElement
 MapKeyElement
 MapValueElement

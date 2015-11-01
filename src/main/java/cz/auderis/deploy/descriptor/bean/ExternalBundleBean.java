@@ -18,13 +18,18 @@
 package cz.auderis.deploy.descriptor.bean;
 
 import cz.auderis.deploy.descriptor.DescriptorParsingException;
+import cz.auderis.deploy.descriptor.initializer.ExternalResourceElement;
+import cz.auderis.deploy.descriptor.visitor.DeploymentStructureVisitor;
 import cz.auderis.deploy.descriptor.visitor.DeploymentVisitor;
 import cz.auderis.deploy.descriptor.visitor.VisitorContext;
 
 import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElementRef;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.XmlType;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.ResourceBundle;
 
 import static cz.auderis.deploy.descriptor.DescriptorParserSupport.isBlank;
@@ -36,11 +41,15 @@ import static cz.auderis.deploy.descriptor.DescriptorParserSupport.parseEnumByNa
 public class ExternalBundleBean extends AbstractBean {
 	private static final long serialVersionUID = 20150728L;
 
+	@XmlElementRef(type = ExternalResourceElement.class, required = false)
+	protected List<ExternalResourceElement> resources;
+
 	@XmlTransient
 	protected ExternalBundleSourceMode sourceMode;
 
 	public ExternalBundleBean() {
 		super(BeanType.EXTERNAL_BUNDLE);
+		this.resources = new ArrayList<ExternalResourceElement>(1);
 		this.sourceMode = ExternalBundleSourceMode.getDefaultMode();
 	}
 
@@ -51,6 +60,10 @@ public class ExternalBundleBean extends AbstractBean {
 
 	public ExternalBundleSourceMode getSourceMode() {
 		return sourceMode;
+	}
+
+	public List<ExternalResourceElement> getResources() {
+		return resources;
 	}
 
 	@XmlAttribute(name = "useResource")
@@ -84,7 +97,21 @@ public class ExternalBundleBean extends AbstractBean {
 	public void accept(DeploymentVisitor visitor, VisitorContext context) {
 		context.pushContextPart(this);
 		try {
-			visitor.visitBundleBean(this);
+			if (visitor instanceof DeploymentStructureVisitor) {
+				final DeploymentStructureVisitor structVisitor = (DeploymentStructureVisitor) visitor;
+				final boolean parentFirst = (VisitorContext.VisitOrder.PARENT_FIRST == context.getVisitOrder());
+				if (parentFirst) {
+					visitor.visitBundleBean(this);
+				}
+				for (final ExternalResourceElement resource : resources) {
+					resource.accept(structVisitor, context);
+				}
+				if (!parentFirst) {
+					visitor.visitBundleBean(this);
+				}
+			} else {
+				visitor.visitBundleBean(this);
+			}
 		} finally {
 			context.popContextPart();
 		}
