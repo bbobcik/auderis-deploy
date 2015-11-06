@@ -33,7 +33,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.text.MessageFormat;
-import java.util.EnumSet;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.ResourceBundle;
@@ -63,6 +63,17 @@ public class BeanLocatorVisitor extends DeploymentVisitorAdapter {
 		} else {
 			this.resourceBundle = ResourceBundle.getBundle(DEFAULT_RESOURCE_BUNDLE);
 		}
+	}
+
+	public Set<String> getLocatedBeanNames() {
+		return Collections.unmodifiableSet(beanMap.keySet());
+	}
+
+	public AbstractBean getBeanByName(String name) {
+		if (null == name) {
+			throw new NullPointerException();
+		}
+		return beanMap.get(name);
 	}
 
 	@Override
@@ -102,22 +113,20 @@ public class BeanLocatorVisitor extends DeploymentVisitorAdapter {
 		final BeanType type  = bean.getBeanType();
 		if (prevBean.getBeanType() != type) {
 			LOG.debug("Type conflict of bean {} with new bean {}", prevBean, bean);
+			prevBean.setLifecycleStage(BeanLifecycleStage.EAGER_CONFLICT_FAILURE);
 			throw new BeanDefinitionException(formatMessage("bean.conflict.type", name, type));
 		}
-		// Apply conflict mode
-		final BeanConflictMode conflictMode = bean.getConflictResolutionMode();
+		// Apply conflict mode rules
 		final BeanConflictMode prevMode = prevBean.getConflictResolutionMode();
-		final Set<BeanConflictMode> conflictUnion = EnumSet.of(conflictMode, prevMode);
-		if (conflictUnion.contains(BeanConflictMode.FAIL)) {
-			LOG.debug("Override of bean {} by bean {} forbidden", prevBean, bean);
-			prevBean.setLifecycleStage(BeanLifecycleStage.EAGER_CONFLICT_FAILURE);
-			throw new BeanDefinitionException(formatMessage("bean.conflict.forbidden", name));
-		} else if (conflictUnion.contains(BeanConflictMode.LAZY_FAIL)) {
-			LOG.debug("Bean {} set for instantiation failure due to existence of bean {}", prevBean, bean);
-			prevBean.setLifecycleStage(BeanLifecycleStage.LAZY_CONFLICT_FAILURE);
-			return true;
-		}
 		switch (prevMode) {
+			case FAIL:
+				LOG.debug("Override of bean {} by bean {} forbidden", prevBean, bean);
+				prevBean.setLifecycleStage(BeanLifecycleStage.EAGER_CONFLICT_FAILURE);
+				throw new BeanDefinitionException(formatMessage("bean.conflict.forbidden", name));
+			case LAZY_FAIL:
+				LOG.debug("Bean {} set for instantiation failure due to existence of bean {}", prevBean, bean);
+				prevBean.setLifecycleStage(BeanLifecycleStage.LAZY_CONFLICT_FAILURE);
+				break;
 			case IGNORE:
 				LOG.debug("Bean {} ignored, definition of bean {} kept", bean, prevBean);
 				break;
